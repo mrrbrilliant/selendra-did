@@ -1,0 +1,269 @@
+import Image from "next/image";
+import MainLayout from "../components/mainLayout";
+import React, { useEffect, useContext, useState } from "react";
+import { ethers } from "ethers";
+import lodash from "lodash";
+
+import { DataContext } from "../contexts/data";
+// @ts-ignore
+import NoData from "../assets/undraw_no_data_re_kwbl.svg";
+import Modal from "../components/modal";
+
+function Organizations() {
+    const { organizations, isOrgLoading, deleteOrg, createOrg } = useContext(DataContext);
+
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [createOrgForm, setCreateOrgForm] = useState({
+        name: "",
+        description: "",
+        orgUri: "",
+    });
+
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [toDelete, setToDelete] = useState({
+        id: -1,
+        name: "",
+        description: "",
+        orgUri: "",
+    });
+
+    function toggleCreateOpenModal() {
+        setCreateModalOpen(!createModalOpen);
+    }
+
+    function toggleDeleteOpen() {
+        setDeleteModalOpen(!deleteModalOpen);
+    }
+
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setCreateOrgForm({ ...createOrgForm, [name]: value });
+    }
+
+    function handleCreateOrg(e) {
+        e.preventDefault();
+        toggleCreateOpenModal();
+        createOrg({ ...createOrgForm });
+    }
+
+    function toNumber(number) {
+        const toUnit = ethers.utils.formatEther(number).toString();
+        const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
+        return roundedCount;
+    }
+
+    function handleDelete() {
+        deleteOrg(toNumber(toDelete.id));
+    }
+
+    return (
+        <div className="overflow-x-auto w-full mt-4">
+            {isOrgLoading && <progress className="progress w-56" />}
+
+            {!isOrgLoading && organizations?.length === 0 && (
+                <div className="w-full h-[50vh] flex flex-col place-content-center place-items-center gap-6">
+                    <Image src={NoData} alt="" width="176px" />
+                    <h1 className="text-lg">No data recorded yet</h1>
+                    <button className="btn btn-primary text-primary-content" onClick={toggleCreateOpenModal}>
+                        Insert
+                    </button>
+                </div>
+            )}
+            {!isOrgLoading && organizations?.length > 0 && (
+                <div className="w-full flex place-items-center py-4">
+                    <div className="flex-grow">
+                        <h1 className="text-xl font-bold">Created organizations</h1>
+                    </div>
+                    <div>
+                        <button className="btn" onClick={toggleCreateOpenModal}>
+                            Create organization
+                        </button>
+                    </div>
+                </div>
+            )}
+            {!isOrgLoading && organizations?.length > 0 && (
+                <table className="table w-full">
+                    <thead>
+                        <tr>
+                            <th>
+                                <label>
+                                    <input type="checkbox" className="checkbox" />
+                                </label>
+                            </th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Link</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {organizations &&
+                            organizations?.length > 0 &&
+                            organizations?.map((org) => (
+                                <TableRow
+                                    key={org.name}
+                                    data={org}
+                                    handleDelete={handleDelete}
+                                    toggleDeleteOpen={toggleDeleteOpen}
+                                    setToDelete={setToDelete}
+                                />
+                            ))}
+                    </tbody>
+
+                    <tfoot>
+                        <tr>
+                            <th>
+                                <label>
+                                    <input type="checkbox" className="checkbox" />
+                                </label>
+                            </th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Link</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            )}
+
+            <Modal open={createModalOpen} toggle={toggleCreateOpenModal}>
+                <form className="form-control w-full" onSubmit={handleCreateOrg}>
+                    {/* name */}
+                    <label className="label">
+                        <span className="label-text">What is your organization name?</span>
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="Type here"
+                        className="input input-bordered w-full"
+                        name="name"
+                        value={createOrgForm.name}
+                        onChange={handleChange}
+                    />
+                    {/* description */}
+                    <label className="label">
+                        <span className="label-text">Describe your orgaization.</span>
+                    </label>
+                    <textarea
+                        className=" textarea textarea-bordered h-24"
+                        placeholder="Bio"
+                        defaultValue={""}
+                        name="description"
+                        value={createOrgForm.description}
+                        onChange={handleChange}
+                        maxLength={168}
+                    />
+                    {/* orgUri */}
+                    <label className="label">
+                        <span className="label-text">Link to your organization</span>
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="Type here"
+                        className="input input-bordered w-full"
+                        name="orgUri"
+                        value={createOrgForm.orgUri}
+                        onChange={handleChange}
+                    />
+                    <input type="submit" className="btn mt-4" value="Create" />
+                </form>
+            </Modal>
+
+            <Modal open={deleteModalOpen} toggle={toggleDeleteOpen}>
+                <div className="w-full flex flex-col space-y-6 ">
+                    <h2 className="text-2xl font-bold ">Warning!</h2>
+                    <div className="text-left">
+                        <p>
+                            <span className="font-bold text-error">{toDelete.name}</span> is about to be removed
+                            permanently! Are your sure you you want to delete?
+                        </p>
+                    </div>
+                    <div className="w-full card-actions flex">
+                        <button
+                            className="btn btn-success flex-grow"
+                            onClick={() => {
+                                toggleDeleteOpen();
+                                setToDelete({
+                                    id: -1,
+                                    name: "",
+                                    description: "",
+                                    orgUri: "",
+                                });
+                            }}
+                        >
+                            CANCEL
+                        </button>
+                        <button
+                            className="btn btn-outline btn-error flex-grow"
+                            onClick={() => {
+                                toggleDeleteOpen();
+                                handleDelete();
+                            }}
+                        >
+                            DELETE
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+        </div>
+    );
+}
+
+Organizations.Layout = MainLayout;
+
+export default Organizations;
+
+function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
+    return (
+        <tr>
+            <th>
+                <label>
+                    <input type="checkbox" className="checkbox" />
+                </label>
+            </th>
+            <td>
+                <div className="flex items-center space-x-3">
+                    <div className="avatar">
+                        <div className="mask mask-squircle w-12 h-12">
+                            <Image
+                                src={`https://avatars.dicebear.com/api/avataaars/${data.name}.svg`}
+                                alt="Avatar Tailwind CSS Component"
+                                width={50}
+                                height={50}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <div className="font-bold">{data.name || ""}</div>
+                    </div>
+                </div>
+            </td>
+            <textarea
+                className="textarea h-28 focus:outline-none resize-none"
+                placeholder="Bio"
+                defaultValue={""}
+                name="description"
+                value={data.desc}
+                readOnly={true}
+            />
+            <td>
+                {(
+                    <a href={data.uri} className="btn-link" target="_blank" rel="noreferrer">
+                        {data.uri}
+                    </a>
+                ) || ""}
+            </td>
+            <th>
+                <button
+                    className="btn btn-xs btn-error"
+                    onClick={() => {
+                        setToDelete(data);
+                        toggleDeleteOpen();
+                    }}
+                >
+                    DELETE
+                </button>
+            </th>
+        </tr>
+    );
+}
