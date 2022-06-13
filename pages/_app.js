@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps }) {
 
     return (
         <SafeHydrate>
-            <ThemeProvider attribute="data-theme" enableSystem={true} defaultTheme="light">
+            <ThemeProvider attribute="data-theme" enableSystem={true} defaultTheme="dark">
                 <NotificationProvider>
                     <NetworkProvider>
                         <WalletProvider>

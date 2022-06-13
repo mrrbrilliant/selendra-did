@@ -32,8 +32,13 @@ export default function NavBar() {
                         </Link>
                     </li>
                     <li>
-                        <Link href="ctypes">
+                        <Link href="/ctypes">
                             <a className={router.pathname == "/ctypes" ? "active" : ""}>Credentials</a>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href="/ctypes/create">
+                            <a className={router.pathname == "/ctypes/create" ? "active" : ""}>Create Credentials</a>
                         </Link>
                     </li>
                 </ul>

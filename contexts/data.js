@@ -165,6 +165,131 @@ export default function DataProvider({ children }) {
     // =======================================================
     // ======================== CTYPES =======================
     // =======================================================
+    // uint256 organizationId,
+    // string memory propertiesURI,
+    // string memory propertiesHash,
+    // bool transferable,
+    // bool revokable,
+    // bool expirable,
+    // uint256 lifespan
+    function ctypesMeta({ id }) {
+        return contract._CtypeMetadata(id).then((tx, error) => {
+            if (error) {
+                const id = uid();
+                notify({
+                    id,
+                    status: "error",
+                    name: "Error",
+                    message: `Failed to fetch CType.\n${error.toString()}`,
+                });
+                return;
+            }
+            return tx;
+        });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    function fetchCtypes() {
+        if (organizations) {
+            return Promise.all(
+                organizations.map(async (org) => {
+                    return fetchCtypesByOrg({ orgId: org.id });
+                })
+            );
+        }
+    }
+    function fetchCtypesByOrg({ orgId }) {
+        contract.ctypeLists(orgId).then((data) => {
+            if (data)
+                Promise.all(
+                    data.map(async (org) => {
+                        const row = await ctypesMeta({ id: toNumber(org) });
+                        return { id: toNumber(org), ...row };
+                    })
+                ).then((ctypes) => {
+                    setCredentialTypes(ctypes);
+                    setIsCTLoading(false);
+                });
+        });
+    }
+
+    function deleteCtype({ organizationId, ctypeId }) {
+        const id = uid();
+        notify({
+            id,
+            status: "loading",
+            name: "Delete credential type",
+            message: `Selected credential type is being removed.`,
+        });
+        contract.deleteCtype(organizationId, ctypeId).then(async (tx, error) => {
+            if (error) {
+                const id = uid();
+                notify({
+                    id,
+                    status: "error",
+                    name: "Error",
+                    message: `Failed to delete CType.\n${error.toString()}`,
+                });
+                return;
+            }
+            await tx.wait();
+            hide(id);
+            const id2 = uid();
+            notify({
+                id: id2,
+                status: "success",
+                name: "Removed",
+                message: `Credential type has been removed Selendra blockchain!`,
+            });
+        });
+    }
+
+    function createCtype({
+        organizationId,
+        propertiesURI,
+        propertiesHash,
+        transferable,
+        revokable,
+        expirable,
+        lifespan,
+    }) {
+        const id = uid();
+        notify({
+            id,
+            status: "loading",
+            name: "Create credential type",
+            message: `Creating a new credential type`,
+        });
+        contract
+            .createCtype(organizationId, propertiesURI, propertiesHash, transferable, revokable, expirable, lifespan)
+            .then(async (tx, error) => {
+                if (error) {
+                    const id = uid();
+                    notify({
+                        id,
+                        status: "error",
+                        name: "Error",
+                        message: `Failed to create CType.\n${error.toString()}`,
+                    });
+                    return;
+                }
+                await tx.wait();
+                hide(id);
+                const id2 = uid();
+                notify({
+                    id: id2,
+                    status: "success",
+                    name: "Created",
+                    message: `Credential type has been registerd on Selendra blockchain!`,
+                });
+            });
+    }
+
+    useEffect(() => {
+        if (!checkingAuth && !isOrgLoading && isCTLoading) {
+            fetchCtypes();
+        }
+    }, [checkingAuth, isCTLoading, isOrgLoading, fetchCtypes]);
 
     useEffect(() => {
         if (!checkingAuth) {
@@ -174,7 +299,7 @@ export default function DataProvider({ children }) {
 
             loadAll();
         }
-    }, [organizationListsByUser, fetchOrgzations, plainWallet, checkingAuth]);
+    }, [organizationListsByUser, fetchOrgzations, checkingAuth]);
 
     const value = {
         isOrgLoading,
@@ -187,6 +312,12 @@ export default function DataProvider({ children }) {
         deleteOrg,
         orgMeta,
         organizationListsByUser,
+        // ctypes
+        isCTLoading,
+        credentialTypes,
+        fetchCtypes,
+        createCtype,
+        deleteCtype,
     };
     return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }

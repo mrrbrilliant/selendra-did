@@ -5,3 +5,20 @@
 [data-theme="*"] {
     transition: 1s ease-in-out;
 }
+
+.table * {
+    border-radius: 0 !important ;
+}
+
+.table input {
+    @apply py-0 px-1;
+}
+
+.table input:focus,
+.table select:focus {
+    outline: none !important;
+}
+
+select {
+    appearance: none !important;
+}

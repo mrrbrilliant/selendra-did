@@ -31,7 +31,7 @@ export default function MainLayout({ children }) {
         <div className="w-full relative">
             <NotificationManager />
             <div className="w-full min-h-screen flex place-content-center">
-                <div className="w-2/3 min-h-full flex flex-col space-y-4">
+                <div className="w-full min-h-full flex flex-col space-y-4 px-4">
                     <Header publicKey={plainWallet?.address || ""} />
                     <div className="w-full min-h-screen bg-base-100 rounded-xl">
                         <NavBar />

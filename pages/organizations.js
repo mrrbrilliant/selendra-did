@@ -238,14 +238,16 @@ function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
                     </div>
                 </div>
             </td>
-            <textarea
-                className="textarea h-28 focus:outline-none resize-none"
-                placeholder="Bio"
-                defaultValue={""}
-                name="description"
-                value={data.desc}
-                readOnly={true}
-            />
+            <td>
+                <textarea
+                    className="textarea h-28 focus:outline-none resize-none"
+                    placeholder="Bio"
+                    defaultValue={""}
+                    name="description"
+                    value={data.desc}
+                    readOnly={true}
+                />
+            </td>
             <td>
                 {(
                     <a href={data.uri} className="btn-link" target="_blank" rel="noreferrer">
