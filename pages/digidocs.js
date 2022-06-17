@@ -1,11 +1,33 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import MainLayout from "../components/mainLayout";
+import { DataContext } from "../contexts/data";
+import Modal from "../components/modal";
+
+import NoData from "../assets/undraw_no_data_re_kwbl.svg";
 
 function Claims() {
+    const { isDocLoading, documents } = useContext(DataContext);
+    const [createOpen, setCreateOpen] = useState(false);
+
+    function toggleCreateOpen() {
+        setCreateOpen(!createOpen);
+    }
+
     return (
         <div className="overflow-x-auto w-full mt-4">
-            <table className="table w-full">
+            {isDocLoading && <progress className="progress w-56" />}
+
+            {!isDocLoading && documents?.length === 0 && (
+                <div className="w-full h-[50vh] flex flex-col place-content-center place-items-center gap-6">
+                    <Image src={NoData} alt="" width="176px" />
+                    <h1 className="text-lg">No data recorded yet</h1>
+                    <button className="btn btn-primary text-primary-content" onClick={toggleCreateOpen}>
+                        Insert
+                    </button>
+                </div>
+            )}
+            {/* <table className="table w-full">
                 <thead>
                     <tr>
                         <th>
@@ -170,7 +192,10 @@ function Claims() {
                         <th></th>
                     </tr>
                 </tfoot>
-            </table>
+            </table> */}
+            <Modal open={createOpen} toggle={toggleCreateOpen}>
+                hi
+            </Modal>
         </div>
     );
 }

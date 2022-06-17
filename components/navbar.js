@@ -44,7 +44,7 @@ export default function NavBar() {
                 </ul>
             </div>
             <div className="navbar-end">
-                <div className="dropdown dropdown-end">
+                <div className="dropdown dropdown-left dropdown-end z-50">
                     <label tabIndex={0} className="btn m-1">
                         Leave
                     </label>

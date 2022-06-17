@@ -82,14 +82,6 @@ function CredentialTypes() {
         updateHash();
     }, [createCtypeForm.propertiesURI]);
 
-    useEffect(() => {
-        console.log(JSON.stringify(createCtypeForm, null, 4));
-    }, [createCtypeForm]);
-
-    useEffect(() => {
-        console.log(JSON.stringify(credentialTypes, null, 4));
-    }, [credentialTypes]);
-
     return (
         <div className="overflow-x-auto w-full mt-4">
             {isCTLoading && <progress className="progress w-56" />}
@@ -103,6 +95,7 @@ function CredentialTypes() {
                     </button>
                 </div>
             )}
+
             {!isCTLoading && credentialTypes?.length > 0 && (
                 <div className="w-full flex place-items-center py-4">
                     <div className="flex-grow">

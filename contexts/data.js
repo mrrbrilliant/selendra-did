@@ -20,7 +20,7 @@ export default function DataProvider({ children }) {
     const [isCTLoading, setIsCTLoading] = useState(true);
     const [credentialTypes, setCredentialTypes] = useState([]);
     // Documents
-    const [isDocLoading, setIsDocLoading] = useState(true);
+    const [isDocLoading, setIsDocLoading] = useState(false);
     const [documents, setDocuments] = useState([]);
 
     // =============================================================
@@ -243,7 +243,13 @@ export default function DataProvider({ children }) {
             });
         });
     }
-
+    // uint256 organizationId,
+    // string memory propertiesURI,
+    // string memory propertiesHash,
+    // bool transferable,
+    // bool revokable,
+    // bool expirable,
+    // uint256 lifespan
     function createCtype({
         organizationId,
         propertiesURI,
@@ -318,6 +324,9 @@ export default function DataProvider({ children }) {
         fetchCtypes,
         createCtype,
         deleteCtype,
+        // docs
+        isDocLoading,
+        documents,
     };
     return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }

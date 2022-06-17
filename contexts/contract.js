@@ -2,7 +2,7 @@ import React, { createContext, useRef, useState, useContext, useEffect } from "r
 import { ethers } from "ethers";
 import WalletProvider, { WalletContext } from "./wallet";
 
-import CTypeManagement from "../CTypeManagement.json";
+import CTypeManagement from "../CreadentialManagement.json";
 
 // @ts-ignore
 export const ContractContext = createContext();
