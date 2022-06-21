@@ -8,6 +8,7 @@ import ContractProvider from "../contexts/contract";
 import DataProvider from "../contexts/data";
 import NotificationProvider from "../contexts/notification";
 import Sidebar from "../components/layouts/leftBar";
+import Navbar from "../components/layouts/navbar";
 
 export function SafeHydrate({ children }) {
   const [isSSR, setIsSSR] = useState(true);
@@ -19,7 +20,8 @@ export function SafeHydrate({ children }) {
 
 function MyApp({ Component, pageProps }) {
   const { theme, setTheme } = useTheme();
-  // const Layout = Component.Layout || DefaultLayout;
+  const Layout = Component.Layout || DefaultLayout;
+  // const Sidebar = Component.Layout || Sidebar;
 
   return (
     <SafeHydrate>
@@ -28,21 +30,36 @@ function MyApp({ Component, pageProps }) {
         enableSystem={true}
         defaultTheme="dark"
       >
-        {/* <Sidebar> */}
-        <NotificationProvider>
-          <NetworkProvider>
-            <WalletProvider>
-              <ContractProvider>
-                <DataProvider>
-                  {/* <Layout> */}
-                  <Component {...pageProps} />
-                  {/* </Layout> */}
-                </DataProvider>
-              </ContractProvider>
-            </WalletProvider>
-          </NetworkProvider>
-        </NotificationProvider>
-        {/* </Sidebar> */}
+        {Component.getLayout ? (
+          <NotificationProvider>
+            <NetworkProvider>
+              <WalletProvider>
+                <ContractProvider>
+                  <DataProvider>
+                    <Component {...pageProps} />
+                  </DataProvider>
+                </ContractProvider>
+              </WalletProvider>
+            </NetworkProvider>
+          </NotificationProvider>
+        ) : (
+          <NotificationProvider>
+            <NetworkProvider>
+              <WalletProvider>
+                <ContractProvider>
+                  <DataProvider>
+                    <Sidebar>
+                      {/* <Layout> */}
+                      {/* <Navbar /> */}
+                      <Component {...pageProps} />
+                      {/* </Layout> */}
+                    </Sidebar>
+                  </DataProvider>
+                </ContractProvider>
+              </WalletProvider>
+            </NetworkProvider>
+          </NotificationProvider>
+        )}
       </ThemeProvider>
     </SafeHydrate>
   );
