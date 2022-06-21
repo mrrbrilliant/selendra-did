@@ -15,12 +15,12 @@ const Navbar = () => {
           />
         </div>
         <div>
-          <div className="bg-primarypink w-28 p-3 flex justify-center rounded-md">
+          <button className="bg-primarypink w-32 p-3 flex justify-center rounded-md">
             {/* <center> */}
-            <img className="w-5" src="/images/log-out.png" />
+            <img className="w-6" src="/images/log-out.png" />
             <h1 className="pl-2 font-semibold text-gray-50">LEAVE</h1>
             {/* </center> */}
-          </div>
+          </button>
         </div>
         {/* <div class="dropdown dropdown-end">
           <label tabindex="0" class="btn btn-ghost btn-circle avatar">

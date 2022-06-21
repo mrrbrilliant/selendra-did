@@ -28,21 +28,21 @@ function MyApp({ Component, pageProps }) {
         enableSystem={true}
         defaultTheme="dark"
       >
-        <Sidebar>
-          <NotificationProvider>
-            <NetworkProvider>
-              <WalletProvider>
-                <ContractProvider>
-                  <DataProvider>
-                    {/* <Layout> */}
-                    <Component {...pageProps} />
-                    {/* </Layout> */}
-                  </DataProvider>
-                </ContractProvider>
-              </WalletProvider>
-            </NetworkProvider>
-          </NotificationProvider>
-        </Sidebar>
+        {/* <Sidebar> */}
+        <NotificationProvider>
+          <NetworkProvider>
+            <WalletProvider>
+              <ContractProvider>
+                <DataProvider>
+                  {/* <Layout> */}
+                  <Component {...pageProps} />
+                  {/* </Layout> */}
+                </DataProvider>
+              </ContractProvider>
+            </WalletProvider>
+          </NetworkProvider>
+        </NotificationProvider>
+        {/* </Sidebar> */}
       </ThemeProvider>
     </SafeHydrate>
   );
