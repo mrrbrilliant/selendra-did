@@ -78,11 +78,11 @@ const Create1 = () => {
       <div>
         <h1 className="font-bold">Create Credentails Type</h1>
         <br />
-        <form>
-          <div className="bg-white px-8 py-8">
+        <div className="bg-white px-8 py-8 rounded-lg">
+          <form>
             <div>
               <label className="font-semibold text-accent">Title</label>
-              <p>{scheme.title}</p>
+
               <input
                 name="title"
                 value={scheme.title}
@@ -118,6 +118,7 @@ const Create1 = () => {
             <div>
               <h1 className="font-bold">Properties</h1>
             </div>
+            {_properties.map((res) => console.log(res))}
             {_properties.map((pro) => (
               <NewProperty
                 key={pro.id}
@@ -128,10 +129,13 @@ const Create1 = () => {
                 handleRemoveOption={handleRemoveOption}
               />
             ))}
-          </div>
-        </form>
-        <button className="w-full btn no-animation h-12" onClick={addProp}>
-          <VscAdd />
+          </form>
+        </div>
+        <button
+          className="w-full bg-accent text-white font-bold rounded-b-lg no-animation h-12"
+          onClick={addProp}
+        >
+          Add More
         </button>
       </div>
     </>
@@ -159,6 +163,7 @@ const NewProperty = ({
     handleAddOption(newOption, data.id);
     setNewOption("");
   }
+
   const dataTypes = [
     { label: "Text", value: "string" },
     { label: "Number", value: "number" },
@@ -166,12 +171,14 @@ const NewProperty = ({
     { label: "List", value: "array" },
     { label: "Object", value: "object" },
   ];
+  const [selected, setSelected] = useState(dataTypes[0].value);
+
   return (
     <div>
       <div className="grid grid-cols-3 gap-7 mt-3">
         <div>
           <label className="font-semibold text-accent">Name</label>
-          {data.name}
+
           <input
             name="name"
             value={data.name}
@@ -182,8 +189,20 @@ const NewProperty = ({
         </div>
         <div>
           <label className="font-semibold text-accent">Type</label>
-          <div class="relative inline-block w-full text-gray-700">
+          <div className="relative inline-block w-full text-gray-700">
             <select
+              name="type"
+              className="w-full h-10 pl-3 pr-6 text-base placeholder-gray-600 border rounded-lg appearance-none focus:shadow-outline"
+              value={data.type}
+              onChange={(e) => handlePropsChange(e, data.id)}
+            >
+              {dataTypes.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {/* <select
               class="w-full h-10 pl-3 pr-6 text-base placeholder-gray-600 border rounded-lg appearance-none focus:shadow-outline"
               placeholder="Regular input"
             >
@@ -194,7 +213,7 @@ const NewProperty = ({
                   </>
                 );
               })}
-            </select>
+            </select> */}
             <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
               <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
                 <path
@@ -206,21 +225,25 @@ const NewProperty = ({
             </div>
           </div>
         </div>
-        <div>
-          <label className="font-semibold text-accent">Description</label>
-          <input
-            name="descriptions"
-            value={data.descriptions}
-            onChange={(e) => handlePropsChange(e, data.id)}
-            className="bg-gray-200 w-full p-2 rounded text-black"
-            placeholder="Description"
-          />
-          <button
-            className="btn btn-xs btn-error btn-square"
-            onClick={() => removeProp(data.id)}
-          >
-            <VscClose />
-          </button>
+        <div className="flex">
+          <div>
+            <label className="font-semibold text-accent">Description</label>
+            <textarea
+              name="descriptions"
+              value={data.descriptions}
+              onChange={(e) => handlePropsChange(e, data.id)}
+              className="bg-gray-200 w-full p-2 h-10 rounded text-black"
+              placeholder="Description"
+            />
+          </div>
+          <div className=" pt-8 pl-10">
+            <button
+              className="btn btn-xs btn-error btn-square"
+              onClick={() => removeProp(data.id)}
+            >
+              <VscClose />
+            </button>
+          </div>
         </div>
       </div>
     </div>

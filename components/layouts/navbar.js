@@ -3,10 +3,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 const Navbar = () => {
   const navigation = [
-    { name: "Account", href: "/" },
+    { name: "Digidocs", href: "/digidocs" },
     { name: "Organization", href: "/organizations1" },
-    { name: "Verifications", href: "/projects" },
-    { name: "Credentails", href: "/ctypes/create" },
+    { name: "Verifications", href: "/verifications1" },
+    { name: "Credentails", href: "/ctypes/index1" },
     { name: "Create Credentails", href: "/ctypes/create1" },
   ];
 
@@ -15,9 +15,9 @@ const Navbar = () => {
   }
   const router = useRouter();
   return (
-    <div class="navbar bg-white px-72">
-      <div class="flex-1">
-        <a class="btn btn-ghost normal-case text-xl">StudentId</a>
+    <div className="navbar bg-white px-72">
+      <div className="flex-1">
+        <a className="btn btn-ghost normal-case text-xl">StudentID</a>
         <div className="flex space-x-4 pl-16">
           {navigation.map((item) => (
             <Link key={item.name} href={item.href}>
@@ -38,12 +38,12 @@ const Navbar = () => {
           ))}
         </div>
       </div>
-      <div class="flex-none gap-2">
-        <div class="form-control">
+      <div className="flex-none gap-2">
+        <div className="form-control">
           <input
             type="text"
             placeholder="Search"
-            class="input input-bordered"
+            className="input input-bordered"
           />
         </div>
         <div>
@@ -54,21 +54,20 @@ const Navbar = () => {
             {/* </center> */}
           </button>
         </div>
-        <div class="dropdown dropdown-end">
-          <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-            <div class="w-10 rounded-full">
+        <div className="dropdown dropdown-end">
+          <label tabindex="0" className="btn btn-ghost btn-circle avatar">
+            <div className="w-10 rounded-full">
               <img src="https://api.lorem.space/image/face?hash=33791" />
             </div>
           </label>
           <ul
             tabindex="0"
-            class="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
+            className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52 filter backdrop-blur-2xl backdrop-brightness-50"
           >
             <li>
-              <a class="justify-between">
+              <Link href="/" className="justify-between">
                 Profile
-                <span class="badge">New</span>
-              </a>
+              </Link>
             </li>
             <li>
               <a>Settings</a>
