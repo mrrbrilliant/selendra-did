@@ -55,7 +55,7 @@ function Claims() {
     console.log(e.target.value);
   }
   return (
-    <div className="overflow-x-auto w-full mt-4">
+    <div className="-mt-10">
       {/* {isDocLoading && <progress className="progress w-56" />}
 
       {!isDocLoading && documents?.length === 0 && (
@@ -71,7 +71,7 @@ function Claims() {
         </div>
       )} */}
       <div>
-        <div className="flex justify-end  rounded-xl">
+        <div className="flex justify-end rounded-xl mt-6">
           <label
             onClick={toggleCreateOpen}
             className="btn bg-accent rounded-xl modal-button"
@@ -184,7 +184,5 @@ function Claims() {
     </div>
   );
 }
-
-Claims.Layout = MainLayout;
 
 export default Claims;
