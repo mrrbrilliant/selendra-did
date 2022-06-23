@@ -1,24 +1,44 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;700&display=swap");
+/* body {
+  font-family: "Quicksand", sans-serif;
+  background-color: #e9eaeb !important;
 
+  height: 110vh !important;
+  background-size: cover !important;
+} */
+/* html,
+body {
+  width: 100%;
+  height: 100%;
+} */
+html,
+body {
+  font-family: "Quicksand", sans-serif;
+  background-color: #e9eaeb !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-attachment: fixed;
+}
 [data-theme="*"] {
-    transition: 1s ease-in-out;
+  transition: 1s ease-in-out;
 }
 
 .table * {
-    border-radius: 0 !important ;
+  border-radius: 0 !important ;
 }
 
 .table input {
-    @apply py-0 px-1;
+  @apply py-0 px-1;
 }
 
 .table input:focus,
 .table select:focus {
-    outline: none !important;
+  outline: none !important;
 }
 
 select {
-    appearance: none !important;
+  appearance: none !important;
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

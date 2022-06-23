@@ -27,14 +27,24 @@ function CredentialTypes() {
         lifespan: 0,
     });
 
+    // <<<<<<< HEAD
+    //     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    //     const [toDelete, setToDelete] = useState({
+    //         id: -1,
+    //         name: "",
+    //         description: "",
+    //         orgUri: "",
+    //         orgId: -1,
+    //     });
+    // =======
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [toDelete, setToDelete] = useState({
         id: -1,
         name: "",
         description: "",
         orgUri: "",
-        orgId: -1,
     });
+    // >>>>>>> origin/den
 
     function toggleCreateOpenModal() {
         setCreateModalOpen(!createModalOpen);
@@ -67,9 +77,7 @@ function CredentialTypes() {
     }
 
     function handleDelete() {
-        const organizationId = toNumber(toDelete.orgId);
-        const ctypeId = toNumber(toDelete.id);
-        deleteCtype({ organizationId, ctypeId });
+        deleteCtype(toNumber(toDelete.id));
     }
 
     function handlePropsChange() {}
@@ -99,6 +107,13 @@ function CredentialTypes() {
                 </div>
             )}
 
+            {/* <<<<<<< HEAD
+    function handleDelete() {
+        const organizationId = toNumber(toDelete.orgId);
+        const ctypeId = toNumber(toDelete.id);
+        deleteCtype({ organizationId, ctypeId });
+    }
+======= */}
             {!isCTLoading && credentialTypes?.length > 0 && (
                 <div className="w-full flex place-items-center py-4">
                     <div className="flex-grow">
@@ -143,6 +158,7 @@ function CredentialTypes() {
                                 />
                             ))}
                     </tbody>
+                    {/* >>>>>>> origin/den */}
 
                     <tfoot>
                         <tr>
@@ -344,8 +360,86 @@ CredentialTypes.Layout = MainLayout;
 export default CredentialTypes;
 
 function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
-    const { organizations } = useContext(DataContext);
+    // <<<<<<< HEAD
+    //     const { organizations } = useContext(DataContext);
 
+    //     function toNumber(number) {
+    //         const toUnit = ethers.utils.formatEther(number).toString();
+    //         const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
+    //         return roundedCount;
+    //     }
+    //     function shorten_address(pubkey) {
+    //         let shorten = "";
+    //         if (pubkey) {
+    //             const length = pubkey.length;
+    //             let front = pubkey.substring(0, 10);
+    //             let back = pubkey.substring(length - 8);
+    //             shorten = `${front}...${back}`;
+    //         }
+
+    //         return shorten;
+    //     }
+
+    //     const orgName = (id) => {
+    //         if (organizations) {
+    //             const org = organizations.filter((o) => toNumber(o.id) === id);
+    //             return org[0]?.name || "";
+    //         }
+    //     };
+
+    //     return (
+    //         <tr>
+    //             <th>
+    //                 <label>
+    //                     <input type="checkbox" className="checkbox" />
+    //                 </label>
+    //             </th>
+    //             <th>{orgName(data.id)}</th>
+
+    //             <th>{data.propertiesURI}</th>
+    //             <th>{shorten_address(data.propertiesHash)}</th>
+    //             <th>
+    //                 <input
+    //                     type="checkbox"
+    //                     className="checkbox checkbox-accent"
+    //                     name="revokable"
+    //                     checked={data.transferable}
+    //                     readOnly
+    //                 />
+    //             </th>
+    //             <th>
+    //                 <input
+    //                     type="checkbox"
+    //                     className="checkbox checkbox-accent"
+    //                     name="revokable"
+    //                     checked={data.revokable}
+    //                     readOnly
+    //                 />
+    //             </th>
+    //             <th>
+    //                 <input
+    //                     type="checkbox"
+    //                     className="checkbox checkbox-accent"
+    //                     name="revokable"
+    //                     checked={data.expirable}
+    //                     readOnly
+    //                 />
+    //             </th>
+    //             <th>{data.expirable ? toNumber(data.lifespan) : "Permanent"}</th>
+    //             <th>
+    //                 <button
+    //                     className="btn btn-xs btn-error"
+    //                     onClick={() => {
+    //                         setToDelete(data);
+    //                         toggleDeleteOpen();
+    //                     }}
+    //                 >
+    //                     DELETE
+    //                 </button>
+    //             </th>
+    //         </tr>
+    //     );
+    // =======
     function toNumber(number) {
         const toUnit = ethers.utils.formatEther(number).toString();
         const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
@@ -353,8 +447,8 @@ function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
     }
     function shorten_address(pubkey) {
         let shorten = "";
+        const length = pubkey.length;
         if (pubkey) {
-            const length = pubkey.length;
             let front = pubkey.substring(0, 10);
             let back = pubkey.substring(length - 8);
             shorten = `${front}...${back}`;
@@ -362,14 +456,6 @@ function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
 
         return shorten;
     }
-
-    const orgName = (id) => {
-        if (organizations) {
-            const org = organizations.filter((o) => toNumber(o.id) === id);
-            return org[0]?.name || "";
-        }
-    };
-
     return (
         <tr>
             <th>
@@ -377,8 +463,7 @@ function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
                     <input type="checkbox" className="checkbox" />
                 </label>
             </th>
-            <th>{orgName(data.id)}</th>
-
+            <th>{shorten_address(data.issuer)}</th>
             <th>{data.propertiesURI}</th>
             <th>{shorten_address(data.propertiesHash)}</th>
             <th>
@@ -422,4 +507,5 @@ function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
             </th>
         </tr>
     );
+    // >>>>>>> origin/den
 }
