@@ -65,54 +65,146 @@
 
 import React, { useContext } from "react";
 import { WalletContext } from "../contexts/wallet";
+import Link from "next/link";
 
+const ownerdata = [
+  {
+    name: "Lyly Food Industry Organization Ministry Of Industry And Handicrafts",
+    des: "hello world",
+    link: "www.Moeyscambodia",
+    logo: "https://cdn.imgbin.com/11/10/25/imgbin-lyly-food-industry-organization-ministry-of-industry-and-handicrafts-sacha-inchi-xHCUjKKbf9nQ07XntD5287hQ8.jpg",
+  },
+  {
+    name: "Royal Cambodian Armed Forces ",
+    des: "hello world",
+    link: "www.Moeyscambodia",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/b/b4/Royal_Cambodian_Armed_Forces_Logo.png",
+  },
+  {
+    name: "Ministries and Institutions",
+    des: "hello world",
+    link: "www.Moeyscambodia",
+    logo: "https://www.mfaic.gov.kh/ministriesLogo/uploads/F9433KJCI9II/Ministry%20of%20Post%20and%20Telecommunications.png",
+  },
+];
 const Index = () => {
   const { lockWallet, forgetWallet, plainWallet } = useContext(WalletContext);
   const publicKey = plainWallet?.address || "";
   const privateKey = plainWallet?.privateKey || "";
   return (
-    <center>
-      <div className="max-w-sm bg-white mt-52 rounded-lg border border-gray-200 shadow-md ">
-        <div className="flex justify-end px-4 pt-4">
-          <button
-            id="dropdownButton"
-            data-dropdown-toggle="dropdown"
-            className="hidden sm:inline-block text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4  focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
-            type="button"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-            </svg>
-          </button>
-        </div>
-        <div className="flex flex-col items-center pb-10">
-          <img
-            className="mb-3 w-24 h-24 rounded-full shadow-lg"
-            src="https://api.lorem.space/image/face?hash=33791"
-            alt="Bonnie image"
-          />
-          <h5 className="mb-1 text-xl font-medium text-accent ">Lay Nath</h5>
-          <h3 classNameName="text-accent mt-3">
-            SEL PubKey:{" "}
-            <span classNameName="text-primary">
-              {publicKey.substring(0, 10)}...
-            </span>
-          </h3>
+    <>
+      <div className="md:grid md:grid-cols-3 gap-10 mt-10">
+        <div className="md:col-span-1">
+          <div className="bg-white p-4 rounded-xl">
+            <img
+              className="w-36 h-36 rounded-full border-gray-600 border-2"
+              src="https://media-exp2.licdn.com/dms/image/C5603AQGp30P66iCXnA/profile-displayphoto-shrink_200_200/0/1628153693733?e=1661385600&v=beta&t=1R1QizZvXLugYKkUaSBU5SxGIQb5dQ9l2nUpBMoKwTo"
+            />
+            <p className="font-bold mt-2 ">Sam MuEL</p>
+          </div>
 
-          <h3 classNameName="text-accent mt-3">
-            SEL PubKey:{" "}
-            <span classNameName="text-primary">
-              {privateKey.substring(0, 10)}...
-            </span>
-          </h3>
+          <div className="mt-4 bg-white p-4 rounded-xl">
+            <h1 className="uppercase font-bold mb-3">Education</h1>
+            <div className="text-sm font-medium mb-2 flex items-center space-x-2">
+              <img
+                className="rounded-full w-16 h-16"
+                src="http://3.bp.blogspot.com/_oN2ovDH18dI/TNKOkWSZeVI/AAAAAAAAAJU/BMk5LbwR9a8/s1600/rupp.jpg"
+              />
+
+              <div className="text-sm font-medium pl-3">
+                <p className=" font-bold">Royal University of PhnomPenh</p>
+                <p className="text-md">Foundation degree, Computer Science</p>
+                <span className="text-xs">2011-2021</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 bg-white p-4 rounded-xl">
+            <h1 className="uppercase font-bold mb-3">Skill</h1>
+            <div className="card-actions mt-4">
+              <span class="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
+                <span>PHP</span>
+              </span>
+              <span class="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
+                <span>Node js</span>
+              </span>
+              <span class="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
+                <span>Solidity</span>
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-4 bg-white p-4 rounded-xl">
+            <h1 className="uppercase font-bold mb-3">Experience</h1>
+            <div>
+              <ul class=" text-sm font-medium ">
+                <li class="py-2 border-b border-gray-200 ">BlockChain Dev</li>
+                <li class=" py-2 border-b border-gray-200 ">Fullstack Dev</li>
+                <li class="py-2 border-b border-gray-200 ">Translater</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="md:col-span-2">
+          {/* <img
+                className="object-center w-full h-72 rounded"
+                src="https://images.unsplash.com/photo-1655666581017-69571d99d6e6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80"
+              /> */}
+          <div>
+            <div className="mb-8">
+              <div>
+                <h3 className="font-bold">My Organizations</h3>
+              </div>
+              <div className="grid grid-cols-3 gap-7 mt-4">
+                {ownerdata.map((res) => {
+                  return (
+                    <div className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
+                      <div className="flex items-center space-x-4">
+                        <img
+                          className="flex-none w-14 h-14 rounded-full object-cover"
+                          src={res.logo}
+                        />
+                        <p className="font-bold">{res.name}</p>
+                      </div>
+                      <div className="align-middle">
+                        <div className="py-2 flex items-center align-middle overflow-hidden">
+                          <div className=" border-t w-full border-gray-300"></div>
+                          <p className="mx-4 text-center">Report</p>
+                          <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                      </div>
+                      <br />
+                      <div className="flex items-center space-x-4 mb-2">
+                        <h1>Document types :</h1>
+                        <p className="font-bold">80</p>
+                      </div>
+
+                      <div className="flex items-center space-x-4 mb-2">
+                        <h1>Created documents :</h1>
+                        <p className="font-bold">80</p>
+                      </div>
+
+                      <div className="flex items-center space-x-4">
+                        <h1>Accounts :</h1>
+                        <p className="font-bold">80</p>
+                      </div>
+
+                      <div className="mt-4 cursor-pointer">
+                        <Link href="/detailorg">
+                          <p className="w-full bg-primary text-white font-semibold text-center p-2 rounded-md hover:bg-opacity-80">
+                            Detail
+                          </p>
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </center>
+    </>
   );
 };
 
