@@ -87,10 +87,10 @@ function Claims() {
     // <<<<<<< HEAD
     function handleCreateDocs() {}
 
-    function handleChange(e) {
-        const { name, value } = e.target;
-        setCreateDocForm({ ...createDocForm, [name]: value });
-    }
+    // function handleChange(e) {
+    //     const { name, value } = e.target;
+    //     setCreateDocForm({ ...createDocForm, [name]: value });
+    // }
 
     return (
         <div className="overflow-x-auto w-full mt-4">
