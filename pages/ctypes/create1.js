@@ -76,7 +76,7 @@ const Create1 = () => {
   return (
     <>
       <div>
-        <h1 className="font-bold">Create Credentails Type</h1>
+        <h1 className="font-bold">Create Documents</h1>
         <br />
         <div className="bg-white px-8 py-8 rounded-lg">
           <form>

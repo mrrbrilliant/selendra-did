@@ -77,7 +77,7 @@ function Claims() {
             className="btn bg-accent rounded-xl modal-button"
             for="my-modal-3"
           >
-            Create Credentails
+            Create Document Type
           </label>
         </div>
 
