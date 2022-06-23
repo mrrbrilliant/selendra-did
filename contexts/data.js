@@ -28,22 +28,24 @@ export default function DataProvider({ children }) {
     // =============================================================
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const fetchOrgzations = () => {
-        organizationListsByUser().then((data) => {
-            if (data)
-                Promise.all(
-                    data.map(async (org) => {
-                        const row = await orgMeta({ key: toNumber(org) });
-                        return { id: toNumber(org), ...row };
-                    })
-                ).then((orgs) => {
-                    setOrganizations(orgs);
-                    setIsOrgLoading(false);
-                });
-        });
+        if (isOrgLoading) {
+            organizationListsByUser().then((data) => {
+                if (data)
+                    Promise.all(
+                        data.map(async (org) => {
+                            const row = await orgMeta({ key: toNumber(org) });
+                            return { id: toNumber(org), ...row };
+                        })
+                    ).then((orgs) => {
+                        setOrganizations(orgs);
+                        setIsOrgLoading(false);
+                    });
+            });
+        }
     };
 
     const refetchOrgzations = async () => {
-        // setIsOrgLoading(true);
+        setIsOrgLoading(true);
         await fetchOrgzations();
     };
     function toNumber(number) {
@@ -188,28 +190,49 @@ export default function DataProvider({ children }) {
         });
     }
 
+    const unique = (value, index, self) => {
+        return self.indexOf(value) === index;
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    function fetchCtypes() {
-        if (organizations) {
-            return Promise.all(
+    async function fetchCtypes() {
+        if (!isCTLoading) [];
+        if (organizations.length > 0) {
+            Promise.all(
                 organizations.map(async (org) => {
-                    return fetchCtypesByOrg({ orgId: org.id });
+                    const type = await fetchCtypesByOrg({ orgId: org.id });
+                    if (type) {
+                        console.log(type);
+                        setCredentialTypes((prev) => {
+                            const data = [...prev, ...type];
+                            const uniqeCtypes = data
+                                .map((d) => JSON.stringify(d))
+                                .filter(unique)
+                                .map((a) => JSON.parse(a));
+                            return [...uniqeCtypes];
+                        });
+                    }
+                    return type;
                 })
-            );
+            ).then((ct) => {
+                setIsCTLoading(false);
+            });
         }
     }
+
+    function refetchCtypes() {
+        setIsCTLoading(true);
+        fetchCtypes();
+    }
     function fetchCtypesByOrg({ orgId }) {
-        contract.ctypeLists(orgId).then((data) => {
-            if (data)
-                Promise.all(
-                    data.map(async (org) => {
-                        const row = await ctypesMeta({ id: toNumber(org) });
-                        return { id: toNumber(org), ...row };
-                    })
-                ).then((ctypes) => {
-                    setCredentialTypes(ctypes);
-                    setIsCTLoading(false);
-                });
+        return contract.ctypeLists(orgId).then(async (data) => {
+            const ctypes = await Promise.all(
+                data.map(async (org) => {
+                    const row = await ctypesMeta({ id: toNumber(org) });
+                    return { id: toNumber(org), ...row };
+                })
+            );
+            return ctypes.filter((x) => x.status === 1);
         });
     }
 
@@ -288,8 +311,13 @@ export default function DataProvider({ children }) {
                     name: "Created",
                     message: `Credential type has been registerd on Selendra blockchain!`,
                 });
+                refetchCtypes();
             });
     }
+
+    useEffect(() => {
+        console.log(credentialTypes);
+    }, [credentialTypes]);
 
     useEffect(() => {
         if (!checkingAuth && !isOrgLoading && isCTLoading) {

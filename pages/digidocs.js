@@ -3,15 +3,40 @@ import Image from "next/image";
 import MainLayout from "../components/mainLayout";
 import { DataContext } from "../contexts/data";
 import Modal from "../components/modal";
-
+import { VscChevronDown } from "react-icons/vsc";
+import { v4 as uid } from "uuid";
+import { ethers } from "ethers";
+// @ts-ignore
 import NoData from "../assets/undraw_no_data_re_kwbl.svg";
 
 function Claims() {
-    const { isDocLoading, documents } = useContext(DataContext);
+    const { isDocLoading, documents, credentialTypes, organizations } = useContext(DataContext);
     const [createOpen, setCreateOpen] = useState(false);
+    const [selectedOrg, setSelectedOrg] = useState(-1);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [createDocForm, setCreateDocForm] = useState({
+        id: uid(),
+        ctypeId: -1,
+        to: "",
+        propertiesURI: "",
+        propertiesHash: "",
+    });
+
+    function toNumber(number) {
+        const toUnit = ethers.utils.formatEther(number).toString();
+        const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
+        return roundedCount;
+    }
 
     function toggleCreateOpen() {
         setCreateOpen(!createOpen);
+    }
+
+    function handleCreateDocs() {}
+
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setCreateDocForm({ ...createDocForm, [name]: value });
     }
 
     return (
@@ -27,174 +52,124 @@ function Claims() {
                     </button>
                 </div>
             )}
-            {/* <table className="table w-full">
-                <thead>
-                    <tr>
-                        <th>
-                            <label>
-                                <input type="checkbox" className="checkbox" />
-                            </label>
-                        </th>
-                        <th>Name</th>
-                        <th>Job</th>
-                        <th>Favorite Color</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>
-                            <label>
-                                <input type="checkbox" className="checkbox" />
-                            </label>
-                        </th>
-                        <td>
-                            <div className="flex items-center space-x-3">
-                                <div className="avatar">
-                                    <div className="mask mask-squircle w-12 h-12">
-                                        <Image
-                                            src={`https://avatars.dicebear.com/api/avataaars/laynath.svg`}
-                                            alt="Avatar Tailwind CSS Component"
-                                            width={50}
-                                            height={50}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="font-bold">Hart Hagerty</div>
-                                    <div className="text-sm opacity-50">United States</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            Zemlak, Daniel and Leannon
-                            <br />
-                            <span className="badge badge-ghost badge-sm">Desktop Support Technician</span>
-                        </td>
-                        <td>Purple</td>
-                        <th>
-                            <button className="btn btn-ghost btn-xs">details</button>
-                        </th>
-                    </tr>
 
-                    <tr>
-                        <th>
-                            <label>
-                                <input type="checkbox" className="checkbox" />
-                            </label>
-                        </th>
-                        <td>
-                            <div className="flex items-center space-x-3">
-                                <div className="avatar">
-                                    <div className="mask mask-squircle w-12 h-12">
-                                        <Image
-                                            src={`https://avatars.dicebear.com/api/avataaars/laynath.svg`}
-                                            alt="Avatar Tailwind CSS Component"
-                                            width={50}
-                                            height={50}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="font-bold">Brice Swyre</div>
-                                    <div className="text-sm opacity-50">China</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            Carroll Group
-                            <br />
-                            <span className="badge badge-ghost badge-sm">Tax Accountant</span>
-                        </td>
-                        <td>Red</td>
-                        <th>
-                            <button className="btn btn-ghost btn-xs">details</button>
-                        </th>
-                    </tr>
-
-                    <tr>
-                        <th>
-                            <label>
-                                <input type="checkbox" className="checkbox" />
-                            </label>
-                        </th>
-                        <td>
-                            <div className="flex items-center space-x-3">
-                                <div className="avatar">
-                                    <div className="mask mask-squircle w-12 h-12">
-                                        <Image
-                                            src={`https://avatars.dicebear.com/api/avataaars/laynath.svg`}
-                                            alt="Avatar Tailwind CSS Component"
-                                            width={50}
-                                            height={50}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="font-bold">Marjy Ferencz</div>
-                                    <div className="text-sm opacity-50">Russia</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            Rowe-Schoen
-                            <br />
-                            <span className="badge badge-ghost badge-sm">Office Assistant I</span>
-                        </td>
-                        <td>Crimson</td>
-                        <th>
-                            <button className="btn btn-ghost btn-xs">details</button>
-                        </th>
-                    </tr>
-
-                    <tr>
-                        <th>
-                            <label>
-                                <input type="checkbox" className="checkbox" />
-                            </label>
-                        </th>
-                        <td>
-                            <div className="flex items-center space-x-3">
-                                <div className="avatar">
-                                    <div className="mask mask-squircle w-12 h-12">
-                                        <Image
-                                            src={`https://avatars.dicebear.com/api/avataaars/laynath.svg`}
-                                            alt="Avatar Tailwind CSS Component"
-                                            width={50}
-                                            height={50}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="font-bold">Yancy Tear</div>
-                                    <div className="text-sm opacity-50">Brazil</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            Wyman-Ledner
-                            <br />
-                            <span className="badge badge-ghost badge-sm">Community Outreach Specialist</span>
-                        </td>
-                        <td>Indigo</td>
-                        <th>
-                            <button className="btn btn-ghost btn-xs">details</button>
-                        </th>
-                    </tr>
-                </tbody>
-
-                <tfoot>
-                    <tr>
-                        <th></th>
-                        <th>Name</th>
-                        <th>Job</th>
-                        <th>Favorite Color</th>
-                        <th></th>
-                    </tr>
-                </tfoot>
-            </table> */}
+            {/* uint256 ctypeId,
+            address to,
+            string memory name,
+            string memory propertyURI,
+            string memory propertyHash */}
             <Modal open={createOpen} toggle={toggleCreateOpen}>
-                hi
+                <form className="form-control w-full" onSubmit={handleCreateDocs}>
+                    <label className="label">
+                        <span className="label-text">Organization</span>
+                    </label>
+
+                    <div className="dropdown w-full">
+                        <label tabIndex={0} className="input-group input m-0 p-0">
+                            <input
+                                name="organizationId"
+                                type="text"
+                                placeholder="Selendra"
+                                className="input w-full flex-grow outline-none focus:outline-none"
+                                value={
+                                    selectedOrg !== -1 ? organizations.filter((o) => o.id == selectedOrg)[0].name : ""
+                                }
+                                readOnly={true}
+                            />
+                            <span className="bg-transparent">
+                                <VscChevronDown />
+                            </span>
+                        </label>
+                        <div className="w-full dropdown-content menu p-0 shadow-lg bg-base-100 rounded-lg my-2 overflow-hidden outline outline-base-300">
+                            {organizations &&
+                                organizations.length > 0 &&
+                                organizations.map((o, index) => (
+                                    <label
+                                        htmlFor="organizationId"
+                                        tabIndex={index}
+                                        key={o.id}
+                                        className="label cursor-pointer hover:bg-blue-300 p-2 transition-all"
+                                        onClick={(e) => setSelectedOrg(toNumber(o.id))}
+                                    >
+                                        {o.name}
+                                    </label>
+                                ))}
+                        </div>
+                    </div>
+
+                    <label className="label">
+                        <span className="label-text">Type</span>
+                    </label>
+
+                    <div className="dropdown w-full">
+                        <label tabIndex={0} className="input-group input m-0 p-0">
+                            <input
+                                name="organizationId"
+                                type="text"
+                                placeholder="National identity"
+                                className="input w-full flex-grow outline-none focus:outline-none"
+                                value={createDocForm.ctypeId !== -1 ? createDocForm.ctypeId : ""}
+                                readOnly={true}
+                            />
+                            <span className="bg-transparent">
+                                <VscChevronDown />
+                            </span>
+                        </label>
+                        <div className="w-full dropdown-content menu p-0 shadow-lg bg-base-100 rounded-lg my-2 overflow-hidden outline outline-base-300">
+                            {credentialTypes &&
+                                credentialTypes.length > 0 &&
+                                credentialTypes
+                                    .filter((o) => toNumber(o.orgId) === selectedOrg)
+                                    .map((o) => (
+                                        <label
+                                            tabIndex={0}
+                                            key={o.id}
+                                            className="label cursor-pointer hover:bg-blue-300 p-2 transition-all overflow-hidden text-ellipsis"
+                                            onClick={() => setCreateDocForm({ ...createDocForm, ctypeId: o.id })}
+                                        >
+                                            {o.propertiesHash}
+                                        </label>
+                                    ))}
+                        </div>
+                    </div>
+
+                    <label className="label">
+                        <span className="label-text">Document URL</span>
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="Type here"
+                        className="input input-bordered w-full"
+                        name="propertiesURI"
+                        // value={createDocForm.propertiesURI}
+                        // onChange={handleChange}
+                    />
+                    <label className="label">
+                        <span className="label-text">Document hash</span>
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="Type here"
+                        className="input input-bordered w-full"
+                        name="propertiesHash"
+                        // value={createDocForm.propertiesHash}
+                        // readOnly={true}
+                    />
+
+                    <label className="label">
+                        <span className="label-text">Owner ID</span>
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="Type here"
+                        className="input input-bordered w-full"
+                        name="propertiesURI"
+                        // value={createDocForm.propertiesURI}
+                        // onChange={handleChange}
+                    />
+
+                    <input type="submit" className="btn mt-4" value="Create" />
+                </form>
             </Modal>
         </div>
     );

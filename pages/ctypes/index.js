@@ -33,6 +33,7 @@ function CredentialTypes() {
         name: "",
         description: "",
         orgUri: "",
+        orgId: -1,
     });
 
     function toggleCreateOpenModal() {
@@ -66,7 +67,9 @@ function CredentialTypes() {
     }
 
     function handleDelete() {
-        deleteCtype(toNumber(toDelete.id));
+        const organizationId = toNumber(toDelete.orgId);
+        const ctypeId = toNumber(toDelete.id);
+        deleteCtype({ organizationId, ctypeId });
     }
 
     function handlePropsChange() {}
@@ -341,6 +344,8 @@ CredentialTypes.Layout = MainLayout;
 export default CredentialTypes;
 
 function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
+    const { organizations } = useContext(DataContext);
+
     function toNumber(number) {
         const toUnit = ethers.utils.formatEther(number).toString();
         const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
@@ -348,8 +353,8 @@ function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
     }
     function shorten_address(pubkey) {
         let shorten = "";
-        const length = pubkey.length;
         if (pubkey) {
+            const length = pubkey.length;
             let front = pubkey.substring(0, 10);
             let back = pubkey.substring(length - 8);
             shorten = `${front}...${back}`;
@@ -357,6 +362,14 @@ function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
 
         return shorten;
     }
+
+    const orgName = (id) => {
+        if (organizations) {
+            const org = organizations.filter((o) => toNumber(o.id) === id);
+            return org[0]?.name || "";
+        }
+    };
+
     return (
         <tr>
             <th>
@@ -364,7 +377,8 @@ function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
                     <input type="checkbox" className="checkbox" />
                 </label>
             </th>
-            <th>{shorten_address(data.issuer)}</th>
+            <th>{orgName(data.id)}</th>
+
             <th>{data.propertiesURI}</th>
             <th>{shorten_address(data.propertiesHash)}</th>
             <th>
