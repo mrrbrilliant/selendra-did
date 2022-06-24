@@ -81,19 +81,12 @@ function Claims() {
           </label>
         </div>
 
-        <div className="grid grid-cols-2 mt-3 gap-7">
+        <div className="grid sm:grid-cols-2 mt-3 gap-7">
           {data.map((res) => {
             return (
-              <div className=" rounded-lg p-3  border-gray-100 bg-white">
-                <div className="grid md:grid-cols-5 gap-10">
-                  <div className="md:col-span-2">
-                    {/* <div
-                    className="bg-no-repeat bg-center h-40 w-auto rounded"
-                    // className="h-72 mx-auto object-cover w-max"
-                    style={{
-                      backgroundImage: `url(${res.logo})`,
-                    }}
-                  ></div> */}
+              <div className=" rounded-lg p-3 border-gray-100 bg-white">
+                <div className="md:grid lg:grid-cols-5 gap-10">
+                  <div className="lg:col-span-2">
                     <div>
                       <img
                         className="h-40 mx-auto object-cover w-max"
@@ -101,8 +94,10 @@ function Claims() {
                       />
                     </div>
                   </div>
-                  <div className="md:col-span-3">
-                    <h4 className="text-xl font-semibold">{res.name}</h4>
+                  <div className="lg:col-span-3 ">
+                    <h4 className="text-xl mt-4 sm:mt-0 font-semibold">
+                      {res.name}
+                    </h4>
                     <p className="text-lg mt-2">
                       {res.des.substring(0, 100)}...
                     </p>

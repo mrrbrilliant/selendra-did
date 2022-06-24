@@ -49,7 +49,7 @@ const data = [
 const Verifications1 = () => {
   return (
     <div>
-      <div className="grid grid-cols-4 gap-7 mt-4">
+      <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-7 mt-4">
         {data.map((res) => {
           return (
             <div

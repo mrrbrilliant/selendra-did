@@ -175,7 +175,15 @@ const NewProperty = ({
 
   return (
     <div>
-      <div className="grid grid-cols-3 gap-7 mt-3">
+      <div className="pt-8 justify-end md:hidden flex">
+        <button
+          className="bg-red-400 rounded-full sm:p-1"
+          onClick={() => removeProp(data.id)}
+        >
+          <VscClose />
+        </button>
+      </div>
+      <div className="grid sm:grid-cols-32 md:grid-cols-3 gap-7 mt-3">
         <div>
           <label className="font-semibold text-accent">Name</label>
 
@@ -225,7 +233,7 @@ const NewProperty = ({
             </div>
           </div>
         </div>
-        <div className="flex">
+        <div className="md:flex">
           <div>
             <label className="font-semibold text-accent">Description</label>
             <textarea
@@ -236,9 +244,9 @@ const NewProperty = ({
               placeholder="Description"
             />
           </div>
-          <div className=" pt-8 pl-10">
+          <div className="pt-8 sm:pl-10 pl-1 hidden md:block">
             <button
-              className="btn btn-xs btn-error btn-square"
+              className="bg-red-400 rounded-full sm:p-1"
               onClick={() => removeProp(data.id)}
             >
               <VscClose />

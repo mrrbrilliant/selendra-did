@@ -390,35 +390,35 @@ const Organizations1 = () => {
         </form>
       </Modal>
 
-      <div className="flex justify-end -mt-9 rounded-xl">
-        <label
+      <div className="sm:flex sm:justify-end sm:-mt-9 rounded-xl -mt-9 mb-5 sm:mb-0">
+        <button
           onClick={toggleCreateOpenModal}
-          className="btn bg-accent rounded-xl modal-button"
-          for="my-modal-3"
+          className=" bg-accent rounded-xl modal-button px-4 py-3 text-white font-bold uppercase text-sm"
+          for="my-modal-1"
         >
           Create Organizations
-        </label>
-        <label
+        </button>
+        <button
           onClick={toggleCreateOpenModaldoc}
-          className="btn bg-accent rounded-xl modal-button ml-2"
-          for="my-modal-3"
+          className="bg-accent rounded-xl modal-button px-4 py-3 text-white font-bold uppercase text-sm sm:ml-2 mt-2 sm:mt-0"
+          for="my-modal-2"
         >
           Create Documents
-        </label>
-        <label
+        </button>
+        <button
           onClick={toggleCreateOpenModalType}
-          className="btn bg-accent rounded-xl modal-button ml-2"
+          className="bg-accent rounded-xl modal-button px-4 py-3 text-white font-bold uppercase text-sm sm:ml-2 mt-2 sm:mt-0"
           for="my-modal-3"
         >
           Create Documents Type
-        </label>
+        </button>
       </div>
       {/* ===================owner Organization======================= */}
       <div className="mb-8">
         <div>
           <h3 className="font-bold">My Organizations</h3>
         </div>
-        <div className="grid grid-cols-4 gap-7 mt-4">
+        <div className="grid md:grid-cols-2 xl:grid-cols-4  sm:grid-cols-2 gap-7 mt-4">
           {ownerdata.map((res) => {
             return (
               <div className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
@@ -469,7 +469,7 @@ const Organizations1 = () => {
       <div>
         <h3 className="font-bold">Other Organizations</h3>
       </div>
-      <div className="grid grid-cols-4 gap-7 mt-4">
+      <div className="grid md:grid-cols-2 xl:grid-cols-4 sm:grid-cols-2 gap-7 mt-4">
         {data.map((res) => {
           return (
             <div className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
@@ -509,7 +509,7 @@ const Organizations1 = () => {
               </div>
 
               <div className="mt-4 cursor-pointer">
-                <Link href="/detailorg">
+                <Link href="/orgs/1">
                   <p className="w-full bg-primary text-white font-semibold text-center p-2 rounded-md hover:bg-opacity-80">
                     Detail
                   </p>

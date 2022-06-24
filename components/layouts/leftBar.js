@@ -13,14 +13,14 @@ const Sidebar = ({ children }) => {
   const { plainWallet, encryptedWallet, checkingAuth } =
     useContext(WalletContext);
 
-  useEffect(() => {
-    if (!checkingAuth) {
-      if (!plainWallet) {
-        router.push("/unlock");
-        return;
-      }
-    }
-  }, [checkingAuth, plainWallet, router]);
+  // useEffect(() => {
+  //   if (!checkingAuth) {
+  //     if (!plainWallet) {
+  //       router.push("/unlock");
+  //       return;
+  //     }
+  //   }
+  // }, [checkingAuth, plainWallet, router]);
 
   useEffect(() => {
     if (!checkingAuth) {
@@ -40,9 +40,9 @@ const Sidebar = ({ children }) => {
   const [blogsBar, setBlogsBar] = useState(false);
 
   return (
-    <div className="h-screen flex-1 ">
+    <div>
       <Navbar />
-      <div className="px-72 mt-14">{children}</div>
+      <div className="px-3 xl:px-72 md:px-6 mt-14">{children}</div>
     </div>
   );
 };

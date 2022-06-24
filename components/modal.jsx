@@ -11,7 +11,7 @@ export default function Modal({ children, open, toggle }) {
       onClick={toggle}
     >
       <div
-        className={` w-full max-w-xl h-auto m-4 bg-white absolute bg-opacity-100 rounded-lg shadow-lg p-8`}
+        className={` w-full max-w-xl h-auto m-4 bg-white absolute bg-opacity-100 rounded-lg shadow-lg sm:p-8 p-4`}
         onClick={(e) => e.stopPropagation()}
       >
         {children}

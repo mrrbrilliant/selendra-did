@@ -153,9 +153,9 @@ const Index = () => {
           <div>
             <div className="mb-8">
               <div>
-                <h3 className="font-bold">My Organizations</h3>
+                <h3 className="font-bold mt-8 sm:mt-0">My Organizations</h3>
               </div>
-              <div className="grid grid-cols-3 gap-7 mt-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-7 mt-4">
                 {ownerdata.map((res) => {
                   return (
                     <div className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
