@@ -40,6 +40,27 @@ function CreateCTypes() {
   function handlePropsChange(e, id) {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
+      // <<<<<<< HEAD
+      //       setProperties((prev) => prev.map((n) => (n.id === id ? { ...n, [name]: checked } : n)));
+      //       return;
+      //     }
+      //     setProperties((prev) => prev.map((n) => (n.id === id ? { ...n, [name]: value } : n)));
+      //   }
+
+      //   function handleAddOption(data, id) {
+      //     // @ts-ignore
+      //     if (data !== "") {
+      //       setProperties((prev) => prev.map((n) => (n.id === id ? { ...n, options: [...n.options, data] } : n)));
+      //     }
+      //   }
+
+      //   function handleRemoveOption(data, id) {
+      //     setProperties((prev) =>
+      //       prev.map((n) => (n.id === id ? { ...n, options: n.options.filter((o) => o !== data) } : n))
+      //     );
+      //   }
+
+      // =======
       setProperties((prev) => prev.map((n) => (n.id === id ? { ...n, [name]: checked } : n)));
       return;
     }
@@ -59,6 +80,7 @@ function CreateCTypes() {
     );
   }
 
+  // >>>>>>> origin/den
   function addProp() {
     setProperties((prev) => [...prev, initialState()]);
   }
@@ -69,6 +91,10 @@ function CreateCTypes() {
   }
 
   useEffect(() => {
+    // <<<<<<< HEAD
+    // =======
+    console.clear();
+    // >>>>>>> origin/den
     console.log(JSON.stringify(_properties, null, 4));
   }, [_properties]);
 
@@ -161,7 +187,11 @@ function CreateCTypes() {
             ))}
             <tr>
               <td colSpan={10} className="p-0 text-center h-12">
+                {/* <<<<<<< HEAD
                 <button className="w-full btn no-animation h-12" onClick={addProp}>
+======= */}
+                <button className="w-full btn no-animation h-12" onClick={addProp}>
+                  {/* >>>>>>> origin/den */}
                   <VscAdd />
                 </button>
               </td>
@@ -177,7 +207,11 @@ CreateCTypes.Layout = MainLayout;
 
 export default CreateCTypes;
 
+// <<<<<<< HEAD
+// const NewProperty = ({ data, removeProp, handlePropsChange, handleAddOption, handleRemoveOption }) => {
+// =======
 const NewProperty = ({ data, removeProp, handlePropsChange, handleAddOption, handleRemoveOption }) => {
+  // >>>>>>> origin/den
   const [newOption, setNewOption] = useState("");
 
   function handleChange(e) {
@@ -218,7 +252,11 @@ const NewProperty = ({ data, removeProp, handlePropsChange, handleAddOption, han
         />
       </td>
       <td className="p-0 border border-slate-300">
+        {/* <<<<<<< HEAD
         <Select data={dataTypes} selected={data.type} handlePropsChange={handlePropsChange} name="type" id={data.id} />
+======= */}
+        <Select data={dataTypes} selected={data.type} handlePropsChange={handlePropsChange} name="type" id={data.id} />
+        {/* >>>>>>> origin/den */}
       </td>
       <td className="p-0 border border-slate-300">
         <Select
@@ -312,7 +350,11 @@ const NewProperty = ({ data, removeProp, handlePropsChange, handleAddOption, han
         />
       </td>
       <td className="py-0 px-2  border border-slate-300">
+        {/* <<<<<<< HEAD
         <button className="btn btn-xs btn-error btn-square" onClick={() => removeProp(data.id)}>
+======= */}
+        <button className="btn btn-xs btn-error btn-square" onClick={() => removeProp(data.id)}>
+          {/* >>>>>>> origin/den */}
           <VscClose />
         </button>
       </td>
@@ -343,9 +385,15 @@ function Select({ id, data, selected, handlePropsChange, name }) {
           <VscChevronDown />
         </span>
       </label>
+      {/* <<<<<<< HEAD
       <div tabIndex={0} className="w-full dropdown-content menu p-0 shadow-lg bg-base-100 rounded-box mb-2">
         {data.map((opt) => (
           <label key={uid()} className="label cursor-pointer hover:bg-blue-300 p-2 transition-all">
+======= */}
+      <div tabIndex={0} className="w-full dropdown-content menu p-0 shadow-lg bg-base-100 rounded-box mb-2">
+        {data.map((opt) => (
+          <label key={uid()} className="label cursor-pointer hover:bg-blue-300 p-2 transition-all">
+            {/* >>>>>>> origin/den */}
             <span className="label-text">{opt.label}</span>
             <input
               type="radio"
