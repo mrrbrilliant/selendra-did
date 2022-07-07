@@ -1,32 +1,111 @@
-import React from "react";
-import Link from "next/link";
-
-const ownerdata = [
-  {
-    name: "Lyly Food Industry Organization Ministry Of Industry And Handicrafts",
-    des: "hello world",
-    link: "www.Moeyscambodia",
-    logo: "https://cdn.imgbin.com/11/10/25/imgbin-lyly-food-industry-organization-ministry-of-industry-and-handicrafts-sacha-inchi-xHCUjKKbf9nQ07XntD5287hQ8.jpg",
-  },
-  {
-    name: "Royal Cambodian Armed Forces ",
-    des: "hello world",
-    link: "www.Moeyscambodia",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/b/b4/Royal_Cambodian_Armed_Forces_Logo.png",
-  },
-  {
-    name: "Ministries and Institutions",
-    des: "hello world",
-    link: "www.Moeyscambodia",
-    logo: "https://www.mfaic.gov.kh/ministriesLogo/uploads/F9433KJCI9II/Ministry%20of%20Post%20and%20Telecommunications.png",
-  },
-];
+import React, { useContext, useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/router";
+import { ethers } from "ethers";
+import { v4 as uid } from "uuid";
+import { ContractContext } from "../contexts/contract";
+import { NotificationContext } from "../contexts/notification";
 
 const Profile = () => {
+  const { contractRO } = useContext(ContractContext);
+  const { notify } = useContext(NotificationContext);
+  // user identity
+  const [isCheckingUser, setIsCheckingUser] = useState(true);
+  const [userAddress, setUserAddress] = useState("");
+  // user info
+  const [isDocLoading, setIsDocLoading] = useState(true);
+  const [documents, setDocuments] = useState([]);
+  const [detail, setDetail] = useState(null);
+  const [personalInfo, setPersonalInfo] = useState(null);
+
+  const router = useRouter();
+
+  const { user } = router.query || "";
+
+  const toNumber = useCallback((number) => {
+    const toUnit = ethers.utils.formatEther(number).toString();
+    const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
+    return roundedCount;
+  }, []);
+
+  const DocMeta = useCallback(
+    (id) => {
+      return contractRO._credentiallMetadata(id).then((tx, error) => {
+        if (error) {
+          const id = uid();
+          notify({
+            id,
+            status: "error",
+            name: "Error",
+            message: `Failed to fetch document.\n${error.toString()}`,
+          });
+          return;
+        }
+
+        return tx;
+      });
+    },
+    [contractRO, notify]
+  );
+
+  const getDocs = useCallback(
+    (address) => {
+      contractRO.credentialsList(address).then((data) => {
+        if (data)
+          Promise.all(
+            data.map(async (docId) => {
+              const row = await DocMeta(toNumber(docId));
+              return { id: toNumber(docId), ...row };
+            })
+          ).then((orgs) => {
+            // @ts-ignore
+            setDocuments(orgs);
+            setIsDocLoading(false);
+          });
+      });
+    },
+    [contractRO, DocMeta, toNumber, setDocuments, setIsDocLoading]
+  );
+
+  useEffect(() => {
+    if (isCheckingUser && user) {
+      const valid = ethers.utils.isAddress(user);
+      if (valid) {
+        setUserAddress(user);
+      }
+      setIsCheckingUser(false);
+    }
+  }, [user, isCheckingUser, setIsCheckingUser, setUserAddress]);
+
+  useEffect(() => {
+    if (!isCheckingUser && userAddress && contractRO) {
+      getDocs(userAddress);
+    }
+  }, [isCheckingUser, userAddress, getDocs, contractRO]);
+
+  useEffect(() => {
+    if (documents && documents.length > 0) {
+      const public_id = documents.filter((d) => d.name === "Public Identity");
+      setDetail(public_id[0]);
+    }
+  }, [documents]);
+
+  useEffect(() => {
+    if (detail && detail.propertyURI) {
+      fetch(detail.propertyURI)
+        .then((res) => res.json())
+        .then((data) => {
+          setPersonalInfo(data);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [detail]);
+
   return (
     <>
       <div className="md:grid md:grid-cols-3 gap-10 mt-10">
-        <div className="md:col-span-1">
+        {!isCheckingUser && !userAddress && <div>User not found</div>}
+        {!isCheckingUser && userAddress && personalInfo && <pre>{JSON.stringify(personalInfo, null, 4)}</pre>}
+        {/* <div className="md:col-span-1">
           <div className="bg-white p-4 rounded-xl">
             <img
               className="w-36 h-36 rounded-full border-gray-600 border-2"
@@ -54,13 +133,13 @@ const Profile = () => {
           <div className="mt-4 bg-white p-4 rounded-xl">
             <h1 className="uppercase font-bold mb-3">Skill</h1>
             <div className="card-actions mt-4">
-              <span class="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
+              <span className="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
                 <span>PHP</span>
               </span>
-              <span class="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
+              <span className="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
                 <span>Node js</span>
               </span>
-              <span class="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
+              <span className="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
                 <span>Solidity</span>
               </span>
             </div>
@@ -69,19 +148,15 @@ const Profile = () => {
           <div className="mt-4 bg-white p-4 rounded-xl">
             <h1 className="uppercase font-bold mb-3">Experience</h1>
             <div>
-              <ul class=" text-sm font-medium ">
-                <li class="py-2 border-b border-gray-200 ">BlockChain Dev</li>
-                <li class=" py-2 border-b border-gray-200 ">Fullstack Dev</li>
-                <li class="py-2 border-b border-gray-200 ">Translater</li>
+              <ul className=" text-sm font-medium ">
+                <li className="py-2 border-b border-gray-200 ">BlockChain Dev</li>
+                <li className=" py-2 border-b border-gray-200 ">Fullstack Dev</li>
+                <li className="py-2 border-b border-gray-200 ">Translater</li>
               </ul>
             </div>
           </div>
         </div>
         <div className="md:col-span-2">
-          {/* <img
-            className="object-center w-full h-72 rounded"
-            src="https://images.unsplash.com/photo-1655666581017-69571d99d6e6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80"
-          /> */}
           <div>
             <div className="mb-8">
               <div>
@@ -92,10 +167,7 @@ const Profile = () => {
                   return (
                     <div className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
                       <div className="flex items-center space-x-4">
-                        <img
-                          className="flex-none w-14 h-14 rounded-full object-cover"
-                          src={res.logo}
-                        />
+                        <img className="flex-none w-14 h-14 rounded-full object-cover" src={res.logo} />
                         <p className="font-bold">{res.name}</p>
                       </div>
                       <div className="align-middle">
@@ -134,7 +206,7 @@ const Profile = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   );

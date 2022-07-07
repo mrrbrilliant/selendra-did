@@ -9,7 +9,7 @@ import { DataContext } from "../contexts/data";
 import NoData from "../assets/undraw_no_data_re_kwbl.svg";
 import Modal from "../components/modal";
 
-function Organizations() {
+function Organizationsx() {
   const { organizations, isOrgLoading, deleteOrg, createOrg } =
     useContext(DataContext);
 

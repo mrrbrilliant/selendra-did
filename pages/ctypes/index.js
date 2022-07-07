@@ -2,7 +2,7 @@ import Image from "next/image";
 import MainLayout from "../../components/mainLayout";
 import React, { useEffect, useContext, useState, useCallback } from "react";
 import { ethers } from "ethers";
-import lodash from "lodash";
+
 import { v4 as uid } from "uuid";
 import { VscChevronDown } from "react-icons/vsc";
 
@@ -13,13 +13,7 @@ import Modal from "../../components/modal";
 import Select from "../../components/select";
 
 function CredentialTypes() {
-  const {
-    credentialTypes,
-    isCTLoading,
-    deleteCtype,
-    createCtype,
-    organizations,
-  } = useContext(DataContext);
+  const { credentialTypes, isCTLoading, deleteCtype, createCtype, organizations } = useContext(DataContext);
 
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [createCtypeForm, setCreateCtypeForm] = useState({
@@ -33,6 +27,16 @@ function CredentialTypes() {
     lifespan: 0,
   });
 
+  // <<<<<<< HEAD
+  //     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  //     const [toDelete, setToDelete] = useState({
+  //         id: -1,
+  //         name: "",
+  //         description: "",
+  //         orgUri: "",
+  //         orgId: -1,
+  //     });
+  // =======
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [toDelete, setToDelete] = useState({
     id: -1,
@@ -40,6 +44,7 @@ function CredentialTypes() {
     description: "",
     orgUri: "",
   });
+  // >>>>>>> origin/den
 
   function toggleCreateOpenModal() {
     setCreateModalOpen(!createModalOpen);
@@ -79,9 +84,7 @@ function CredentialTypes() {
 
   const updateHash = useCallback(() => {
     if (createCtypeForm.propertiesURI !== "") {
-      const hash = ethers.utils.sha256(
-        ethers.utils.toUtf8Bytes(createCtypeForm.propertiesURI)
-      );
+      const hash = ethers.utils.sha256(ethers.utils.toUtf8Bytes(createCtypeForm.propertiesURI));
       setCreateCtypeForm({ ...createCtypeForm, propertiesHash: hash });
     }
   }, [createCtypeForm, setCreateCtypeForm]);
@@ -98,15 +101,19 @@ function CredentialTypes() {
         <div className="w-full h-[50vh] flex flex-col place-content-center place-items-center gap-6">
           <Image src={NoData} alt="" width="176px" />
           <h1 className="text-lg">No data recorded yet</h1>
-          <button
-            className="btn btn-primary text-primary-content"
-            onClick={toggleCreateOpenModal}
-          >
+          <button className="btn btn-primary text-primary-content" onClick={toggleCreateOpenModal}>
             Insert
           </button>
         </div>
       )}
 
+      {/* <<<<<<< HEAD
+    function handleDelete() {
+        const organizationId = toNumber(toDelete.orgId);
+        const ctypeId = toNumber(toDelete.id);
+        deleteCtype({ organizationId, ctypeId });
+    }
+======= */}
       {!isCTLoading && credentialTypes?.length > 0 && (
         <div className="w-full flex place-items-center py-4">
           <div className="flex-grow">
@@ -151,6 +158,7 @@ function CredentialTypes() {
                 />
               ))}
           </tbody>
+          {/* >>>>>>> origin/den */}
 
           <tfoot>
             <tr>
@@ -196,9 +204,7 @@ function CredentialTypes() {
                 className="input w-full flex-grow"
                 value={
                   createCtypeForm.organizationId !== -1
-                    ? organizations.filter(
-                        (o) => o.id == createCtypeForm.organizationId
-                      )[0].name
+                    ? organizations.filter((o) => o.id == createCtypeForm.organizationId)[0].name
                     : ""
                 }
                 readOnly={true}
@@ -207,17 +213,11 @@ function CredentialTypes() {
                 <VscChevronDown />
               </span>
             </label>
-            <div
-              tabIndex={0}
-              className="w-full dropdown-content menu p-0 shadow-lg bg-base-100 rounded-box mb-2"
-            >
+            <div tabIndex={0} className="w-full dropdown-content menu p-0 shadow-lg bg-base-100 rounded-box mb-2">
               {organizations &&
                 organizations.length > 0 &&
                 organizations.map((o) => (
-                  <label
-                    key={o.id}
-                    className="label cursor-pointer hover:bg-blue-300 p-2 transition-all"
-                  >
+                  <label key={o.id} className="label cursor-pointer hover:bg-blue-300 p-2 transition-all">
                     <span className="label-text">{o.name}</span>
                     <input
                       type="radio"
@@ -263,7 +263,6 @@ function CredentialTypes() {
               <span className="label-text">Expirable</span>
               <input
                 type="checkbox"
-                defaultChecked={false}
                 className="checkbox checkbox-accent"
                 name="expirable"
                 checked={createCtypeForm.expirable}
@@ -297,7 +296,6 @@ function CredentialTypes() {
               <span className="label-text">Revokable</span>
               <input
                 type="checkbox"
-                defaultChecked={false}
                 className="checkbox checkbox-accent"
                 name="revokable"
                 checked={createCtypeForm.revokable}
@@ -314,9 +312,8 @@ function CredentialTypes() {
           <h2 className="text-2xl font-bold ">Warning!</h2>
           <div className="text-left">
             <p>
-              <span className="font-bold text-error">{toDelete.name}</span> is
-              about to be removed permanently! Are your sure you you want to
-              delete?
+              <span className="font-bold text-error">{toDelete.name}</span> is about to be removed permanently! Are your
+              sure you you want to delete?
             </p>
           </div>
           <div className="w-full card-actions flex">
@@ -355,6 +352,86 @@ CredentialTypes.Layout = MainLayout;
 export default CredentialTypes;
 
 function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
+  // <<<<<<< HEAD
+  //     const { organizations } = useContext(DataContext);
+
+  //     function toNumber(number) {
+  //         const toUnit = ethers.utils.formatEther(number).toString();
+  //         const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
+  //         return roundedCount;
+  //     }
+  //     function shorten_address(pubkey) {
+  //         let shorten = "";
+  //         if (pubkey) {
+  //             const length = pubkey.length;
+  //             let front = pubkey.substring(0, 10);
+  //             let back = pubkey.substring(length - 8);
+  //             shorten = `${front}...${back}`;
+  //         }
+
+  //         return shorten;
+  //     }
+
+  //     const orgName = (id) => {
+  //         if (organizations) {
+  //             const org = organizations.filter((o) => toNumber(o.id) === id);
+  //             return org[0]?.name || "";
+  //         }
+  //     };
+
+  //     return (
+  //         <tr>
+  //             <th>
+  //                 <label>
+  //                     <input type="checkbox" className="checkbox" />
+  //                 </label>
+  //             </th>
+  //             <th>{orgName(data.id)}</th>
+
+  //             <th>{data.propertiesURI}</th>
+  //             <th>{shorten_address(data.propertiesHash)}</th>
+  //             <th>
+  //                 <input
+  //                     type="checkbox"
+  //                     className="checkbox checkbox-accent"
+  //                     name="revokable"
+  //                     checked={data.transferable}
+  //                     readOnly
+  //                 />
+  //             </th>
+  //             <th>
+  //                 <input
+  //                     type="checkbox"
+  //                     className="checkbox checkbox-accent"
+  //                     name="revokable"
+  //                     checked={data.revokable}
+  //                     readOnly
+  //                 />
+  //             </th>
+  //             <th>
+  //                 <input
+  //                     type="checkbox"
+  //                     className="checkbox checkbox-accent"
+  //                     name="revokable"
+  //                     checked={data.expirable}
+  //                     readOnly
+  //                 />
+  //             </th>
+  //             <th>{data.expirable ? toNumber(data.lifespan) : "Permanent"}</th>
+  //             <th>
+  //                 <button
+  //                     className="btn btn-xs btn-error"
+  //                     onClick={() => {
+  //                         setToDelete(data);
+  //                         toggleDeleteOpen();
+  //                     }}
+  //                 >
+  //                     DELETE
+  //                 </button>
+  //             </th>
+  //         </tr>
+  //     );
+  // =======
   function toNumber(number) {
     const toUnit = ethers.utils.formatEther(number).toString();
     const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
@@ -422,4 +499,5 @@ function TableRow({ data, handleDelete, toggleDeleteOpen, setToDelete }) {
       </th>
     </tr>
   );
+  // >>>>>>> origin/den
 }

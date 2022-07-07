@@ -51,31 +51,51 @@ const Detailorg = () => {
         Documents type of Moey Cambodia
         {id}
       </h1>
-      <div className="grid sm:grid-cols-2 gap-7 mt-3">
-        {popular.map((res) => {
-          return (
-            <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer h-52">
-              <img
-                className="object-center w-full"
-                src={res.logo}
-                alt="Flower and sky"
-              />
-              <div className="h-full absolute top-0 left-0 px-6 py-4 bg-opacity-60 bg-accent">
-                <h4 className="mb-3 text-2xl font-semibold tracking-tight text-white">
-                  {res.name}
-                </h4>
-                <p className="leading-normal text-white text-lg">
-                  {res.des.substring(0, 100)}...
-                </p>
-                <Link href="/ctypes/create1">
-                  <button className=" w-32 mt-4 text-white font-medium p-2 rounded bg-primarypink bg-opacity-80">
-                    Create
-                  </button>
-                </Link>
-              </div>
-            </div>
-          );
-        })}
+      <div className="grid grid-cols-2 gap-7 mt-3">
+        <div className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer h-52">
+          <img
+            className="object-center w-full"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MoEYS_%28Cambodia%29.svg/1200px-MoEYS_%28Cambodia%29.svg.png"
+            alt="Flower and sky"
+          />
+          <div className="h-full absolute top-0 left-0 px-6 py-4 bg-opacity-60 bg-accent">
+            <h4 className="mb-3 text-2xl font-semibold tracking-tight text-white">
+              Certification
+            </h4>
+            <p className="leading-normal text-white text-lg">
+              Lorem ipsum dolor, sit amet cons ectetur adipis icing elit.
+              Praesen tium, quibusdam facere quo laborum maiores sequi nam
+              tenetur laud.
+            </p>
+            <Link href="/ctypes/create1">
+              <button className=" w-32 mt-4 text-white font-medium p-2 rounded bg-primarypink bg-opacity-80">
+                Create
+              </button>
+            </Link>
+          </div>
+        </div>
+        <div className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer h-52">
+          <img
+            className="object-cover w-full"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MoEYS_%28Cambodia%29.svg/1200px-MoEYS_%28Cambodia%29.svg.png"
+            alt="Flower and sky"
+          />
+          <div className="h-full absolute top-0 left-0 px-6 py-4 bg-opacity-60 bg-accent">
+            <h4 className="mb-3 text-2xl font-semibold tracking-tight text-white">
+              Certification
+            </h4>
+            <p className="leading-normal text-white text-lg">
+              Lorem ipsum dolor, sit amet cons ectetur adipis icing elit.
+              Praesen tium, quibusdam facere quo laborum maiores sequi nam
+              tenetur laud.
+            </p>
+            <Link href="/ctypes/create1">
+              <button className=" w-32 mt-4 text-white font-medium p-2 rounded bg-primarypink bg-opacity-80">
+                Create
+              </button>
+            </Link>
+          </div>
+        </div>
       </div>
       <br />
       <div className="grid sm:grid-cols-2 mt-3 gap-7">

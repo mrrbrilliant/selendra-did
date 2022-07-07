@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Link from "next/link";
-import Modal from "../components/modal";
+import Modal from "../../components/modal";
 import { v4 as uid } from "uuid";
 import { VscChevronDown } from "react-icons/vsc";
+import { DataContext } from "../../contexts/data";
+import Image from "next/image";
+import { ethers } from "ethers";
+import { WalletContext } from "../../contexts/wallet";
+import BtnWithAuth from "../../hooks/useAuthCallback";
+
 const initialState = {
   name: "",
   type: "",
@@ -11,10 +17,23 @@ const initialState = {
   ownerId: "",
 };
 
-const Organizations1 = () => {
+const Organizations = () => {
+  // Context
+  const {
+    organizations,
+    isOrgLoading,
+    deleteOrg,
+    createOrg,
+    ownOrganizations,
+    isOwnOrgLoading,
+  } = useContext(DataContext);
+
+  const { setCb, toggleRequest, wallet } = useContext(WalletContext);
+
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [createModalOpendoc, setCreateModalOpendoc] = useState(false);
   const [createModalOpenType, setCreateModalOpenType] = useState(false);
+
   function toggleCreateOpenModal() {
     setCreateModalOpen(!createModalOpen);
   }
@@ -30,6 +49,7 @@ const Organizations1 = () => {
     description: "",
     orgUri: "",
   });
+
   const [state, setState] = useState(initialState);
   const [createCtypeForm, setCreateCtypeForm] = useState({
     id: uid(),
@@ -61,91 +81,40 @@ const Organizations1 = () => {
     setCreateCtypeForm({ ...createCtypeForm, [name]: value });
     console.log(value);
   }
+
+  function handleCreateOrg(e) {
+    e.preventDefault();
+    toggleCreateOpenModal();
+    createOrg({ ...createOrgForm });
+  }
+
+  function toNumber(number) {
+    const toUnit = ethers.utils.formatEther(number).toString();
+    const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
+    return roundedCount;
+  }
+
   useEffect(() => {
-    console.clear();
     console.log(JSON.stringify(createOrgForm, null, 4));
   }, [createOrgForm]);
 
-  const ownerdata = [
-    {
-      name: "Lyly Food Industry Organization Ministry Of Industry And Handicrafts",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://cdn.imgbin.com/11/10/25/imgbin-lyly-food-industry-organization-ministry-of-industry-and-handicrafts-sacha-inchi-xHCUjKKbf9nQ07XntD5287hQ8.jpg",
-    },
-    {
-      name: "Royal Cambodian Armed Forces ",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/b/b4/Royal_Cambodian_Armed_Forces_Logo.png",
-    },
-    {
-      name: "Ministries and Institutions",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://www.mfaic.gov.kh/ministriesLogo/uploads/F9433KJCI9II/Ministry%20of%20Post%20and%20Telecommunications.png",
-    },
-  ];
+  const otherOrgs = organizations.filter(function (array_el) {
+    return (
+      ownOrganizations.filter(function (anotherOne_el) {
+        return anotherOne_el.name == array_el.name;
+      }).length == 0
+    );
+  });
 
-  const data = [
-    {
-      name: "Moeys Cambodia",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "/images/moeyslogo.png",
-    },
-    {
-      name: "Ministry of Tourism",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://atf2022cambodia.com/images/mot-logo.png",
-    },
-    {
-      name: "Ministry of Health",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://upload.wikimedia.org/wikipedia/en/3/30/MOH_logo.png",
-    },
-    {
-      name: "Ministry Of National Defence Of Cambodia",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Ministry_of_National_Defense_%28Cambodia%29.png/440px-Ministry_of_National_Defense_%28Cambodia%29.png",
-    },
-    {
-      name: "Ministries and Institutions",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://www.mfaic.gov.kh/ministriesLogo/uploads/JNURR9M0JW9X/Press%20OMC.png",
-    },
-    {
-      name: "MAFF (Cambodia)",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://i.pinimg.com/originals/00/f0/bc/00f0bc241249b9688da89e15a53ee795.png",
-    },
-    {
-      name: "WAT4CAM",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://wat4cam-mowram.com/images/logo.png",
-    },
-    {
-      name: "Ministries and Institutions",
-      des: "hello world",
-      link: "www.Moeyscambodia",
-      logo: "https://www.mfaic.gov.kh/ministriesLogo/uploads/I1MQHWGFJFNF/Ministry%20of%20Mines%20and%20Energy.png",
-    },
-  ];
+  useEffect(() => {
+    console.log(organizations);
+  }, [organizations]);
 
   return (
     <>
       {/* =================>create orgaization Modal<================== */}
       <Modal open={createModalOpen} toggle={toggleCreateOpenModal}>
-        <form
-          className="form-control w-full"
-          //   onSubmit={handleCreateOrg}
-        >
+        <form className="form-control w-full" onSubmit={handleCreateOrg}>
           {/* name */}
           <label className="label">
             <span className="label-text text-lg">
@@ -154,7 +123,7 @@ const Organizations1 = () => {
           </label>
           <input
             type="text"
-            placeholder="Type here"
+            placeholder="Selendra"
             className="bg-gray-200 w-full p-2 rounded text-black"
             name="name"
             // value={createOrgForm.name}
@@ -168,7 +137,7 @@ const Organizations1 = () => {
           </label>
           <textarea
             className="  h-24 bg-gray-200 w-full p-2 rounded text-black"
-            placeholder="Bio"
+            placeholder="Interoperable Nominated Proof-of-Stake network for developing and running Substrate-based and EVM compatible blockchain applications."
             defaultValue={""}
             name="description"
             // value={createOrgForm.description}
@@ -183,7 +152,7 @@ const Organizations1 = () => {
           </label>
           <input
             type="text"
-            placeholder="Type here"
+            placeholder="https://selendra.org"
             className="bg-gray-200 w-full p-2 rounded text-black"
             name="orgUri"
             // value={createOrgForm.orgUri}
@@ -275,46 +244,12 @@ const Organizations1 = () => {
                 type="text"
                 placeholder="Type"
                 className=" bg-gray-200 w-full p-2 rounded text-black"
-                // value={
-                //     createCtypeForm.organizationId !== -1
-                //         ? organizations.filter((o) => o.id == createCtypeForm.organizationId)[0].name
-                //         : ""
-                // }
-                // value="test"
                 readOnly={true}
               />
               <span className="bg-transparent">
                 <VscChevronDown />
               </span>
             </label>
-            {/* <div
-                            tabIndex={0}
-                            className="w-full dropdown-content menu p-0 shadow-lg bg-base-100 rounded-box mb-2"
-                        >
-                            {organizations &&
-                                organizations.length > 0 &&
-                                organizations.map((o) => (
-                                    <label
-                                        key={o.id}
-                                        className="label cursor-pointer hover:bg-blue-300 p-2 transition-all"
-                                    >
-                                        <span className="label-text">{o.name}</span>
-                                        <input
-                                            type="radio"
-                                            name="organizationId"
-                                            className="radio checked:bg-blue-500"
-                                            checked={createCtypeForm.organizationId == o.id}
-                                            value={o.id}
-                                            onChange={(e) =>
-                                                setCreateCtypeForm({
-                                                    ...createCtypeForm,
-                                                    organizationId: toNumber(o.id),
-                                                })
-                                            }
-                                        />
-                                    </label>
-                                ))}
-                        </div> */}
           </div>
           <label className="label">
             <span className="label-text text-lg">Schema URL</span>
@@ -344,23 +279,12 @@ const Organizations1 = () => {
               <span className="label-text text-base">Expirable</span>
               <input
                 type="checkbox"
-                defaultChecked={false}
                 className="checkbox checkbox-accent"
                 name="expirable"
                 // checked={createCtypeForm.expirable}
                 onChange={handleChangeType}
               />
             </label>
-            {/* {createCtypeForm.expirable && (
-              <input
-                type="number"
-                placeholder="Number of days to expire"
-                className="input input-bordered w-full"
-                name="lifespan"
-                // value={createCtypeForm.lifespan}
-                onChange={handleChange}
-              />
-            )} */}
           </div>
 
           <div>
@@ -378,7 +302,6 @@ const Organizations1 = () => {
               <span className="label-text text-base">Revokable</span>
               <input
                 type="checkbox"
-                defaultChecked={false}
                 className="checkbox checkbox-accent"
                 name="revokable"
                 // checked={createCtypeForm.revokable}
@@ -390,44 +313,136 @@ const Organizations1 = () => {
         </form>
       </Modal>
 
-      <div className="sm:flex sm:justify-end sm:-mt-9 rounded-xl -mt-9 mb-5 sm:mb-0">
-        <button
-          onClick={toggleCreateOpenModal}
-          className=" bg-accent rounded-xl modal-button px-4 py-3 text-white font-bold uppercase text-sm"
-          for="my-modal-1"
+      <div className="flex justify-end -mt-9 rounded-xl space-x-4">
+        {/* <label
+          onClick={() => {
+            toggleCreateOpenModal();
+          }}
+          className="btn bg-accent rounded-xl modal-button"
+        >
+          Unlock CB
+        </label> */}
+        {/* <label
+          onClick={(e) => {
+            if (wallet) {
+              toggleCreateOpenModal();
+            } else {
+              const cb = () => toggleCreateOpenModal();
+              setCb(() => cb);
+              toggleRequest();
+            }
+          }}
+          className="btn bg-accent rounded-xl modal-button"
+          htmlFor="my-modal-3"
         >
           Create Organizations
-        </button>
-        <button
+        </label> */}
+
+        <BtnWithAuth callback={toggleCreateOpenModal}>
+          <label className="btn bg-accent rounded-xl modal-button">
+            Create Organizations
+          </label>
+        </BtnWithAuth>
+
+        {/* <label
           onClick={toggleCreateOpenModaldoc}
-          className="bg-accent rounded-xl modal-button px-4 py-3 text-white font-bold uppercase text-sm sm:ml-2 mt-2 sm:mt-0"
-          for="my-modal-2"
+          className="btn bg-accent rounded-xl modal-button ml-2"
+          htmlFor="my-modal-3"
         >
           Create Documents
         </button>
         <button
           onClick={toggleCreateOpenModalType}
-          className="bg-accent rounded-xl modal-button px-4 py-3 text-white font-bold uppercase text-sm sm:ml-2 mt-2 sm:mt-0"
-          for="my-modal-3"
+          className="btn bg-accent rounded-xl modal-button ml-2"
+          htmlFor="my-modal-3"
         >
           Create Documents Type
-        </button>
+        </label> */}
       </div>
       {/* ===================owner Organization======================= */}
       <div className="mb-8">
         <div>
           <h3 className="font-bold">My Organizations</h3>
         </div>
-        <div className="grid md:grid-cols-2 xl:grid-cols-4  sm:grid-cols-2 gap-7 mt-4">
-          {ownerdata.map((res) => {
+        <div className="grid grid-cols-4 gap-7 mt-4">
+          {ownOrganizations &&
+            ownOrganizations.map((org, index) => {
+              return (
+                <div
+                  key={index}
+                  className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300"
+                >
+                  <div className="flex items-center space-x-4">
+                    <Image
+                      className="flex-none w-14 h-14 rounded-full object-cover"
+                      src="https://avatars.githubusercontent.com/u/49308834?s=200&v=4"
+                      width={56}
+                      height={56}
+                      alt=""
+                    />
+                    <p className="font-bold">{org.name}</p>
+                  </div>
+                  <div className="align-middle">
+                    <div className="py-2 flex items-center align-middle overflow-hidden">
+                      <div className=" border-t w-full border-gray-300"></div>
+                      <p className="mx-4 text-center">Report</p>
+                      <div className="w-full border-t border-gray-300"></div>
+                    </div>
+                  </div>
+                  <br />
+                  <div className="flex items-center space-x-4 mb-2">
+                    <h1>Asset types :</h1>
+                    <p className="font-bold">80</p>
+                  </div>
+
+                  <div className="flex items-center space-x-4 mb-2">
+                    <h1>Assets created :</h1>
+                    <p className="font-bold">80</p>
+                  </div>
+
+                  <div className="flex items-center space-x-4">
+                    <h1>Holders :</h1>
+                    <p className="font-bold">80</p>
+                  </div>
+
+                  <div className="mt-4 cursor-pointer">
+                    <Link
+                      href={`/organizations/${org.id}`}
+                      as={`/organizations/${org.id}`}
+                    >
+                      <p className="w-full bg-primary text-white font-semibold text-center p-2 rounded-md hover:bg-opacity-80">
+                        Detail
+                      </p>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      </div>
+
+      {/* =========================>other orgaization======================= */}
+      <div>
+        <h3 className="font-bold">Other Organizations</h3>
+      </div>
+      <div className="grid grid-cols-4 gap-7 mt-4">
+        {organizations &&
+          ownOrganizations &&
+          otherOrgs.map((org, index) => {
             return (
-              <div className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
+              <div
+                key={index}
+                className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300"
+              >
                 <div className="flex items-center space-x-4">
-                  <img
+                  <Image
                     className="flex-none w-14 h-14 rounded-full object-cover"
-                    src={res.logo}
+                    src="https://avatars.githubusercontent.com/u/49308834?s=200&v=4"
+                    width={56}
+                    height={56}
+                    alt=""
                   />
-                  <p className="font-bold">{res.name}</p>
+                  <p className="font-bold">{org.name}</p>
                 </div>
                 <div className="align-middle">
                   <div className="py-2 flex items-center align-middle overflow-hidden">
@@ -453,7 +468,10 @@ const Organizations1 = () => {
                 </div>
 
                 <div className="mt-4 cursor-pointer">
-                  <Link href="/detailorg">
+                  <Link
+                    href={`/organizations/${org.id}`}
+                    as={`/organizations/${org.id}`}
+                  >
                     <p className="w-full bg-primary text-white font-semibold text-center p-2 rounded-md hover:bg-opacity-80">
                       Detail
                     </p>
@@ -462,65 +480,9 @@ const Organizations1 = () => {
               </div>
             );
           })}
-        </div>
-      </div>
-
-      {/* =========================>other orgaization======================= */}
-      <div>
-        <h3 className="font-bold">Other Organizations</h3>
-      </div>
-      <div className="grid md:grid-cols-2 xl:grid-cols-4 sm:grid-cols-2 gap-7 mt-4">
-        {data.map((res) => {
-          return (
-            <div className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
-              <div className="flex items-center space-x-4">
-                <img
-                  className="flex-none w-14 h-14 rounded-full object-cover"
-                  src={res.logo}
-                />
-                <p className="font-bold">{res.name}</p>
-              </div>
-              {/* <div className="mt-3">
-                <p className="text-md text-gray-600">
-                  {res.des.substring(0, 190)}...
-                </p>
-              </div> */}
-              <div className="align-middle">
-                <div className="py-2 flex items-center align-middle overflow-hidden">
-                  <div className=" border-t w-full border-gray-300"></div>
-                  <p className="mx-4 text-center">Report</p>
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-              </div>
-              <br />
-              <div className="flex items-center space-x-4 mb-2">
-                <h1>Document types :</h1>
-                <p className="font-bold">80</p>
-              </div>
-
-              <div className="flex items-center space-x-4 mb-2">
-                <h1>Created documents :</h1>
-                <p className="font-bold">80</p>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <h1>Accounts :</h1>
-                <p className="font-bold">80</p>
-              </div>
-
-              <div className="mt-4 cursor-pointer">
-                <Link href="/orgs/1">
-                  <p className="w-full bg-primary text-white font-semibold text-center p-2 rounded-md hover:bg-opacity-80">
-                    Detail
-                  </p>
-                </Link>
-              </div>
-            </div>
-          );
-        })}
       </div>
     </>
   );
 };
 
-export default Organizations1;
+export default Organizations;
