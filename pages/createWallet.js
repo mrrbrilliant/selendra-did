@@ -11,8 +11,7 @@ const initalState = {
 };
 
 export default function CreateWallet() {
-  const { plainWallet, encryptedWallet, checkingAuth, createWallet } =
-    useContext(WalletContext);
+  const { wallet, publicKey, encryptedWallet, checkingAuth, createWallet } = useContext(WalletContext);
   const router = useRouter();
   const [form, setForm] = useState(initalState);
 
@@ -33,23 +32,24 @@ export default function CreateWallet() {
   }
 
   useEffect(() => {
-    const mnemonic = ethers.Wallet.createRandom().mnemonic.phrase;
-    console.log(mnemonic);
-    setForm({ ...form, mnemonic });
-  }, []);
+    if (!form.mnemonic) {
+      const mnemonic = ethers.Wallet.createRandom().mnemonic.phrase;
+      setForm({ ...form, mnemonic });
+    }
+  }, [setForm, form]);
 
   useEffect(() => {
     if (!checkingAuth) {
-      if (!plainWallet && encryptedWallet) {
-        router.push("/unlock");
+      if (publicKey && encryptedWallet) {
+        router.push("/");
         return;
       }
     }
-  }, [checkingAuth, encryptedWallet, plainWallet, router]);
+  }, [checkingAuth, encryptedWallet, publicKey, router]);
 
   return (
-    <div className="w-full min-h-screen flex place-items-center place-content-center bg-base-300">
-      <div className="card w-96 bg-base-100 shadow-xl p-6">
+    <div className="w-full min-h-screen flex place-items-center place-content-center">
+      <div className="card w-96 shadow-xl p-6 bg-base-300">
         <div className="card-body p-0">
           <a className="label font-bold">CREATE WALLET</a>
           <form className="form-control w-full" onSubmit={handleSubmit}>
@@ -88,13 +88,7 @@ export default function CreateWallet() {
             ></textarea>
             <label className="label cursor-pointer mt-2">
               <span className="label-text">I have kept my seeds</span>
-              <input
-                type="checkbox"
-                className="checkbox"
-                name="saved"
-                checked={form.saved}
-                onChange={handleChange}
-              />
+              <input type="checkbox" className="checkbox" name="saved" checked={form.saved} onChange={handleChange} />
             </label>
             <label className="label mt-2">
               <input
@@ -102,11 +96,7 @@ export default function CreateWallet() {
                 value="CREATE"
                 className="w-full btn btn-primary text-primary-content"
                 disabled={
-                  !form.saved ||
-                  !form.mnemonic ||
-                  !form.password ||
-                  !form.confirm ||
-                  form.password !== form.confirm
+                  !form.saved || !form.mnemonic || !form.password || !form.confirm || form.password !== form.confirm
                 }
               />
             </label>
@@ -116,6 +106,3 @@ export default function CreateWallet() {
     </div>
   );
 }
-CreateWallet.getLayout = function PageLayout(page) {
-  return <>{page}</>;
-};

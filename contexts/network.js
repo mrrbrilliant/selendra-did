@@ -8,7 +8,7 @@ NetworkContext.displayName = "NetworkContext";
 const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_WSS_ADDRESS);
 
 export default function NetworkProvider({ children }) {
-    const [network] = useState(provider);
+  const [network] = useState(provider);
 
-    return <NetworkContext.Provider value={network}>{children}</NetworkContext.Provider>;
+  return <NetworkContext.Provider value={network}>{children}</NetworkContext.Provider>;
 }

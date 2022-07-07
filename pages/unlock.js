@@ -3,8 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 export default function Unlock() {
-  const { plainWallet, encryptedWallet, checkingAuth, unlockWallet } =
-    useContext(WalletContext);
+  const { wallet, encryptedWallet, checkingAuth, unlockWallet } = useContext(WalletContext);
   const [password, setPassword] = useState("");
   const router = useRouter();
 
@@ -16,17 +15,17 @@ export default function Unlock() {
   function handleSubmit(e) {
     e.preventDefault();
     unlockWallet({ password });
-    router.push("/");
+    router.back();
   }
 
   useEffect(() => {
     if (!checkingAuth) {
-      if (!plainWallet && !encryptedWallet) {
+      if (!wallet && !encryptedWallet) {
         router.push("/createWallet");
         return;
       }
     }
-  }, [checkingAuth, encryptedWallet, plainWallet, router]);
+  }, [checkingAuth, encryptedWallet, wallet, router]);
 
   return (
     <div className="w-full min-h-screen flex place-items-center place-content-center bg-base-300">
@@ -47,11 +46,7 @@ export default function Unlock() {
               onChange={handleChange}
             />
             <label className="label mt-2">
-              <input
-                type="submit"
-                value="UNLOCK"
-                className="w-full btn btn-primary text-primary-content"
-              />
+              <input type="submit" value="UNLOCK" className="w-full btn btn-primary text-primary-content" />
             </label>
           </form>
         </div>
@@ -60,6 +55,6 @@ export default function Unlock() {
   );
 }
 
-Unlock.getLayout = function PageLayout(page) {
-  return <>{page}</>;
-};
+// Unlock.getLayout = function PageLayout(page) {
+//   return <>{page}</>;
+// };

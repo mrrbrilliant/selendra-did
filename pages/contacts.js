@@ -1,47 +1,47 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import React from "react";
 
 const data = [
   {
-    name: "Vilson",
-    job: "BlockChain Dev",
+    name: "Afton Kessler",
+    job: "Senior Response Director",
     favColor: "purple",
-    avatar: "https://api.lorem.space/image/face?hash=33791",
+    avatar: "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/587.jpg",
     verify: true,
   },
   {
-    name: "Chatha",
-    job: "Fullstack Dev",
+    name: "Melody McClure",
+    job: "Central Configuration Supervisor",
     verify: true,
     favColor: "pink",
-    avatar: "https://api.lorem.space/image/face?hash=33791",
-    verify: false,
+    avatar: "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/6.jpg",
   },
   {
-    name: "Sovanden",
-    job: "BlockChain Dev",
+    name: "Jannie Hickle",
+    job: "Human Creative Facilitator",
     favColor: "white",
-    avatar: "https://api.lorem.space/image/face?hash=33791",
+    avatar: "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1054.jpg",
   },
   {
-    name: "Thit",
-    job: "Web Dev",
+    name: "Gwen Hyatt",
+    job: "Legacy Program Specialist",
     favColor: "red",
-    avatar: "https://api.lorem.space/image/face?hash=33791",
+    avatar: "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/674.jpg",
     verify: true,
   },
   {
-    name: "Soklya",
-    job: "Web Dev",
+    name: "Cornell Von",
+    job: "Global Optimization Producer",
     favColor: "purple",
-    avatar: "https://api.lorem.space/image/face?hash=33791",
+    avatar: "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/371.jpg",
     verify: true,
   },
   {
-    name: "Seyha",
-    job: "Mobile Dev",
+    name: "Nels Rempel",
+    job: "Product Infrastructure Supervisor",
     favColor: "purple",
-    avatar: "https://api.lorem.space/image/face?hash=33791",
+    avatar: "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/760.jpg",
     verify: false,
   },
 ];
@@ -50,54 +50,32 @@ const Verifications1 = () => {
   return (
     <div>
       <div className="grid grid-cols-4 gap-7 mt-4">
-        {data.map((res) => {
+        {data.map((res, index) => {
           return (
             <div
-              className="w-auto bg-white  rounded-xl transform transition-all duration-300 border-r-4"
-              // className={
-              //   res.verify === true
-              //     ? "w-auto bg-white p-4 rounded-xl transform transition-all duration-300 border-r-4 "
-              //     : "w-auto bg-white p-4 rounded-xl transform transition-all duration-300 border-r-4 "
-              // }
+              key={index}
+              className="w-auto bg-base-100  rounded-xl transform transition-all duration-300 overflow-hidden"
             >
               <div className="p-4">
-                <div className="flex flex-col items-center space-x-4">
-                  <img
-                    className="flex-none w-32 h-32 border-4 border-gray-400 rounded-full object-cover"
-                    src={res.avatar}
-                  />
+                <div className="flex flex-col place-items-center place-content-center p-4">
+                  <div className="p-2 rounded-full bg-gradient-radial from-amber-200 via-blue-200 to-sky-200">
+                    <img className="flex-none w-28 h-28 rounded-full object-cover " src={res.avatar} alt="" />
+                  </div>
                 </div>
-                <div className="text-center mt-3">
-                  <p className="font-bold">{res.name}</p>
-                  <span
-                    className="text-sm font-medium"
-                    // className="text-xs bg-primarypink text-white font-bold px-2 py-0.5  rounded-xl"
-                  >
-                    {res.job}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-sm mt-1 text-center font-semibold ">
-                    Skill
-                  </p>
-                  <div className="card-actions mt-4">
-                    <span class="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
-                      <span>PHP</span>
-                    </span>
-                    <span class="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
-                      <span>Node js</span>
-                    </span>
-                    <span class="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
-                      <span>Solidity</span>
-                    </span>
+                <div className="text-center flex flex-col gap-1">
+                  <p className="font-bold text-xl">{res.name}</p>
+                  <span className="text-sm font-medium">{res.job}</span>
+                  <p className=" divider text-sm mt-4 text-center font-semibold">Specialities</p>
+                  <div className="card-actions  flex place-content-center">
+                    <div className="badge badge-outline badge-warning badge-md">PHP</div>
+                    <div className="badge badge-outline badge-warning badge-md">Node JS</div>
+                    <div className="badge badge-outline badge-warning badge-md">Solidity</div>
                   </div>
                 </div>
               </div>
               <div className=" mt-2">
                 <Link href="/profile">
-                  <button className="uppercase hover:bg-primary text-accent py-4 px-2 w-full rounded-b-xl hover:text-white font-bold">
-                    Detail
-                  </button>
+                  <button className="btn btn-block btn-info border-none rounded-t-none hover:text-white">Detail</button>
                 </Link>
               </div>
             </div>

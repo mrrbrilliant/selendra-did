@@ -1,22 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: false,
-    target: "serverless",
-    async rewrites() {
-        return [
-            {
-                source: "/:any*",
-                destination: "/",
-            },
-        ];
-    },
-    webpack: (config) => {
-        config.resolve.fallback = { fs: false };
-        return config;
-    },
-    images: {
-        domains: ["avatars.dicebear.com", "api.lorem.space"],
-    },
+  reactStrictMode: false,
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false };
+    return config;
+  },
+  images: {
+    domains: [
+      "avatars.dicebear.com",
+      "api.lorem.space",
+      "avatars.githubusercontent.com",
+      "upload.wikimedia.org",
+      "media-exp2.licdn.com",
+      "gateway.kumandra.org",
+    ],
+    dangerouslyAllowSVG: true,
+  },
 };
 
 module.exports = nextConfig;

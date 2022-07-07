@@ -1,42 +1,41 @@
-import NavBar from "./navbar";
-import Header from "./header";
+import NavBar from "../components/navbar";
+import Header from "../components/header";
 import { WalletContext } from "../contexts/wallet";
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import NotificationManager from "./notifications/manager";
+import NotificationManager from "../components/notifications/manager";
 import Link from "next/link";
-import Navbar from "./layouts/navbar";
+import Navbar from "../components/layouts/navbar";
 export default function MainLayout({ children }) {
   const [newsBar, setNewsBar] = useState(false);
 
-  const { plainWallet, encryptedWallet, checkingAuth } =
-    useContext(WalletContext);
+  const { wallet, encryptedWallet, checkingAuth, publicKey } = useContext(WalletContext);
   const router = useRouter();
 
   useEffect(() => {
     if (!checkingAuth) {
-      if (!plainWallet) {
+      if (!publicKey) {
         router.push("/unlock");
         return;
       }
     }
-  }, [checkingAuth, plainWallet, router]);
+  }, [checkingAuth, publicKey, router]);
 
   useEffect(() => {
     if (!checkingAuth) {
-      if (!encryptedWallet) {
+      if (!encryptedWallet && !publicKey) {
         router.push("/createWallet");
         return;
       }
     }
-  }, [checkingAuth, encryptedWallet, router]);
+  }, [checkingAuth, encryptedWallet, publicKey, router]);
 
   return (
     // <div className="w-full relative">
     //   <NotificationManager />
     //   <div className="w-full min-h-screen flex place-content-center">
     //     <div className="w-full min-h-full flex flex-col space-y-4 px-4">
-    //       <Header publicKey={plainWallet?.address || ""} />
+    //       <Header publicKey={wallet?.address || ""} />
     //       <div className="w-full min-h-screen bg-base-100 rounded-xl">
     //         <NavBar />
     //         {children}
@@ -45,11 +44,7 @@ export default function MainLayout({ children }) {
     //   </div>
     // </div>
     <div className="flex">
-      <div
-        className={` ${
-          open ? "w-72" : "w-20 "
-        } bg-white h-screen p-5  pt-8 relative duration-300`}
-      >
+      <div className={` ${open ? "w-72" : "w-20 "} bg-white h-screen p-5  pt-8 relative duration-300`}>
         <img
           src="/images/control.png"
           className={`absolute cursor-pointer -right-3 top-9 w-7 border-dark-purple
@@ -60,15 +55,9 @@ export default function MainLayout({ children }) {
           <img
             // src="https://www.koompi.com/images/Koompi-white.png"
             src="/images/Koompi-WiFi-Icon.png"
-            className={`cursor-pointer duration-500 w-10 ${
-              open && "rotate-[360deg]"
-            }`}
+            className={`cursor-pointer duration-500 w-10 ${open && "rotate-[360deg]"}`}
           />
-          <h1
-            className={`text-accent origin-left font-medium text-xl duration-200 ${
-              !open && "scale-0"
-            }`}
-          >
+          <h1 className={`text-accent origin-left font-medium text-xl duration-200 ${!open && "scale-0"}`}>
             StudentId
           </h1>
         </div>
@@ -85,11 +74,7 @@ export default function MainLayout({ children }) {
            }  `}
               >
                 <img src="/images/Chart_fill.png" />
-                <span
-                  className={`${!open && "hidden"} origin-left duration-200`}
-                >
-                  Dashboard
-                </span>
+                <span className={`${!open && "hidden"} origin-left duration-200`}>Dashboard</span>
               </p>
             </Link>
           </li>
@@ -100,19 +85,10 @@ export default function MainLayout({ children }) {
             >
               <img src="/images/Chart.png" />
 
-              <span
-                className={`${
-                  !open && "hidden"
-                } flex-1 ml-3 text-left whitespace-nowrap origin-left duration-200`}
-              >
+              <span className={`${!open && "hidden"} flex-1 ml-3 text-left whitespace-nowrap origin-left duration-200`}>
                 Account
               </span>
-              <svg
-                className="w-6 h-6"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path
                   fill-rule="evenodd"
                   d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -120,12 +96,7 @@ export default function MainLayout({ children }) {
                 ></path>
               </svg>
             </span>
-            <ul
-              id="dropdown-example"
-              className={`${
-                !newsBar && "hidden"
-              }  space-y-2 relative duration-300 pt-3`}
-            >
+            <ul id="dropdown-example" className={`${!newsBar && "hidden"}  space-y-2 relative duration-300 pt-3`}>
               <li>
                 <Link
                   href="/createorg"

@@ -2,7 +2,7 @@ import Image from "next/image";
 import MainLayout from "../../components/mainLayout";
 import React, { useEffect, useContext, useState, useCallback } from "react";
 import { ethers } from "ethers";
-import lodash from "lodash";
+
 import { v4 as uid } from "uuid";
 import { VscChevronDown } from "react-icons/vsc";
 
@@ -263,7 +263,6 @@ function CredentialTypes() {
               <span className="label-text">Expirable</span>
               <input
                 type="checkbox"
-                defaultChecked={false}
                 className="checkbox checkbox-accent"
                 name="expirable"
                 checked={createCtypeForm.expirable}
@@ -297,7 +296,6 @@ function CredentialTypes() {
               <span className="label-text">Revokable</span>
               <input
                 type="checkbox"
-                defaultChecked={false}
                 className="checkbox checkbox-accent"
                 name="revokable"
                 checked={createCtypeForm.revokable}

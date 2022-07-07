@@ -7,64 +7,118 @@ export const WalletContext = createContext();
 WalletContext.displayName = "WalletContext";
 
 export default function WalletProvider({ children }) {
-    const provider = useContext(NetworkContext);
-    const [checkingAuth, setCheckingAuth] = useState(true);
-    const [encryptedWallet, setEncryptedWallet] = useState("");
-    const [plainWallet, setPlainWallet] = useState(null);
-    const router = useRouter();
+  const provider = useContext(NetworkContext);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [encryptedWallet, setEncryptedWallet] = useState(null);
+  const [publicKey, setPublicKey] = useState(null);
+  const [privateKey, setPrivateKey] = useState("");
+  const [wallet, setWallet] = useState(null);
+  const [show, setShow] = useState(false);
+  const [cb, setCb] = useState();
+  const router = useRouter();
 
-    function createWallet({ password, mnemonic }) {
-        const wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
-        // @ts-ignore
-        setPlainWallet(wallet);
+  function createWallet({ password, mnemonic }) {
+    const _wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
+    // @ts-ignore
 
-        wallet
-            .encrypt(password, {
-                scrypt: {
-                    N: 4096,
-                },
-            })
-            .then((encryptedWallet) => {
-                window.localStorage.setItem("encryptedWallet", encryptedWallet);
-                setEncryptedWallet(encryptedWallet);
-                router.push("/");
-            });
-    }
+    _wallet
+      .encrypt(password, {
+        scrypt: {
+          N: 4096,
+        },
+      })
+      .then((encryptedWallet) => {
+        window.localStorage.setItem("encryptedWallet", encryptedWallet);
+        setEncryptedWallet(encryptedWallet);
 
-    function unlockWallet({ password }) {
-        try {
-            const wallet = ethers.Wallet.fromEncryptedJsonSync(encryptedWallet, password).connect(provider);
-            // @ts-ignore
-            setPlainWallet(wallet);
-        } catch (error) {
-            console.log(error);
+        setWallet(_wallet);
+        setPrivateKey(_wallet.privateKey);
+        setPublicKey(_wallet.address);
+        window.localStorage.setItem("publicKey", _wallet.address);
+
+        router.push("/");
+      });
+  }
+
+  async function unlockWallet({ password }) {
+    return new Promise((resolve, reject) => {
+      try {
+        const _wallet = ethers.Wallet.fromEncryptedJsonSync(encryptedWallet, password).connect(provider);
+        if (_wallet) {
+          setPublicKey(_wallet.address);
+          setPrivateKey(_wallet.privateKey);
+          window.localStorage.setItem("publicKey", _wallet.address);
+          window.sessionStorage.setItem("privateKey", _wallet.privateKey);
+          // @ts-ignore
+          setWallet(_wallet);
+          return resolve(true);
         }
-    }
+      } catch (error) {
+        return reject(error);
+      }
+    });
+  }
 
-    function lockWallet() {
-        window.location.replace("/unlock");
-    }
+  function lockWallet() {
+    setPrivateKey(null);
+    setWallet(null);
+    window.sessionStorage.removeItem("privateKey");
+    router.push("/unlock");
+  }
 
-    function forgetWallet() {
-        window.localStorage.removeItem("encryptedWallet");
-        window.location.replace("/createWallet");
-    }
+  function forgetWallet() {
+    window.localStorage.removeItem("encryptedWallet");
+    router.replace("/createWallet");
+  }
 
-    useEffect(() => {
-        const initalEncryptedWallet = window.localStorage.getItem("encryptedWallet") || null;
-        if (initalEncryptedWallet) {
-            setEncryptedWallet(initalEncryptedWallet);
+  function toggleRequest() {
+    setShow(!show);
+  }
+
+  useEffect(() => {
+    if (checkingAuth) {
+      // setEncryptedWallet(initalEncryptedWallet);
+      const initialEncryptedWallet = window.localStorage.getItem("encryptedWallet") || null;
+      const initialPublicKey = window.localStorage.getItem("publicKey") || null;
+
+      setEncryptedWallet(initialEncryptedWallet);
+      setPublicKey(initialPublicKey);
+      setCheckingAuth(false);
+    }
+  }, [checkingAuth, setEncryptedWallet, setPublicKey, setCheckingAuth]);
+
+  useEffect(() => {
+    if (!checkingAuth) {
+      if (!publicKey && !encryptedWallet) {
+        if (router.pathname !== "/createWallet") {
+          router.replace("/createWallet");
         }
-        setCheckingAuth(false);
-    }, []);
-    const value = {
-        plainWallet,
-        encryptedWallet,
-        checkingAuth,
-        createWallet,
-        unlockWallet,
-        lockWallet,
-        forgetWallet,
-    };
-    return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
+        return;
+      }
+
+      if (!publicKey && encryptedWallet) {
+        if (router.pathname !== "/unlock") {
+          router.replace("/unlock");
+        }
+        return;
+      }
+    }
+  }, [checkingAuth, publicKey, encryptedWallet, router]);
+
+  const value = {
+    wallet,
+    encryptedWallet,
+    checkingAuth,
+    createWallet,
+    unlockWallet,
+    lockWallet,
+    forgetWallet,
+    publicKey,
+    privateKey,
+    show,
+    cb,
+    setCb,
+    toggleRequest,
+  };
+  return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
 }
