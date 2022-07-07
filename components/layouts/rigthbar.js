@@ -4,7 +4,6 @@ import Navbar from "./navbar";
 const Rigthbar = () => {
   return (
     <>
-      {/* <Navbar /> */}
       <div className="pr-7 pt-3">
         <div className="bg-white p-3 rounded h-44">
           <div className="relative h-32 w-80 ">
@@ -15,12 +14,8 @@ const Rigthbar = () => {
                 alt=""
               />
               <div className="ltr:ml-3 ml-4">
-                <p className="text-sm font-medium text-slate-300 ">
-                  Sarim Sovanden
-                </p>
-                <p className="text-sm font-medium text-slate-500 ">
-                  FullStack Developer
-                </p>
+                <p className="text-sm font-medium text-slate-300 ">Sarim Sovanden</p>
+                <p className="text-sm font-medium text-slate-500 ">FullStack Developer</p>
               </div>
             </div>
             <div></div>

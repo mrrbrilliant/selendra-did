@@ -55,11 +55,7 @@ const Index1 = () => {
   return (
     <div>
       <div className="flex justify-end -mt-9 rounded-xl">
-        <label
-          onClick={toggleCreateOpenModal}
-          className="btn bg-accent rounded-xl modal-button"
-          for="my-modal-3"
-        >
+        <label onClick={toggleCreateOpenModal} className="btn bg-accent rounded-xl modal-button" for="my-modal-3">
           Create Credentails
         </label>
       </div>
@@ -146,7 +142,6 @@ const Index1 = () => {
               <span className="label-text text-base">Expirable</span>
               <input
                 type="checkbox"
-                defaultChecked={false}
                 className="checkbox checkbox-accent"
                 name="expirable"
                 // checked={createCtypeForm.expirable}
@@ -180,7 +175,6 @@ const Index1 = () => {
               <span className="label-text text-base">Revokable</span>
               <input
                 type="checkbox"
-                defaultChecked={false}
                 className="checkbox checkbox-accent"
                 name="revokable"
                 // checked={createCtypeForm.revokable}
@@ -205,10 +199,7 @@ const Index1 = () => {
                     }}
                   ></div> */}
                   <div>
-                    <img
-                      className="h-40 mx-auto object-cover w-max"
-                      src={res.logo}
-                    />
+                    <img className="h-40 mx-auto object-cover w-max" src={res.logo} />
                   </div>
                 </div>
                 <div className="md:col-span-3">
