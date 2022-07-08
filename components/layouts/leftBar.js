@@ -18,30 +18,12 @@ const Sidebar = ({ children }) => {
 
   const { publicKey, encryptedWallet, checkingAuth } = useContext(WalletContext);
 
-  // useEffect(() => {
-  //   if (!checkingAuth) {
-  //     if (!publicKey && !encryptedWallet) {
-  //       router.push("/unlock");
-  //       return;
-  //     }
-  //   }
-  // }, [checkingAuth, publicKey, encryptedWallet, router]);
-
-  // useEffect(() => {
-  //   if (!checkingAuth) {
-  //     if (!encryptedWallet && !publicKey) {
-  //       router.push("/createWallet");
-  //       return;
-  //     }
-  //   }
-  // }, [checkingAuth, encryptedWallet, router]);
-
   function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
   }
 
   return (
-    <div className="h-screen flex-1 ">
+    <div className="h-auto min-h-screen flex-1 ">
       <Navbar />
       <div className="px-72 mt-14">{children}</div>
     </div>

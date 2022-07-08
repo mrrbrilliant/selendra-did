@@ -13,7 +13,7 @@ import { ContractContext } from "../../../contexts/contract";
 export default function Docs() {
   const {
     credentialTypes,
-    isCredentialTypesLoading,
+    isCTLoading,
     createDocument,
     organizations,
     isOrgLoading,
@@ -326,24 +326,21 @@ export default function Docs() {
   }
 
   useEffect(() => {
-    if (!isCredentialTypesLoading) {
+    if (!isCTLoading) {
       if (isSearching && credentialTypes) {
-        const { orgId, type } = router.query;
-
         const _data = credentialTypes.filter((t) => {
           const _orgId = toNumber(t.orgId);
           const _type = toNumber(t.CTypeId);
           const __type = parseInt(type);
           const __orgId = parseInt(orgId);
-
           return _type === __type && _orgId === __orgId;
         });
-        console.log(_data);
         setForm(_data[0]);
         setIsSearching(false);
       }
+      console.log("isCTLoading", isCTLoading);
     }
-  }, [isSearching, setIsSearching, isCredentialTypesLoading, credentialTypes, router]);
+  }, [isSearching, setIsSearching, isCTLoading, credentialTypes, router, orgId, type]);
 
   useEffect(() => {
     if (!isSearching && form) {
@@ -448,13 +445,13 @@ export default function Docs() {
     }
   }, [wallet, toggleRequest, show]);
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
+  // useEffect(() => {
+  //   console.log(formData);
+  // }, [formData]);
 
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
+  // useEffect(() => {
+  //   console.log(errors);
+  // }, [errors]);
 
   return (
     <div className="w-full">

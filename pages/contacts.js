@@ -58,18 +58,21 @@ const Verifications1 = () => {
             >
               <div className="p-4">
                 <div className="flex flex-col place-items-center place-content-center p-4">
-                  <div className="p-2 rounded-full bg-gradient-radial from-amber-200 via-blue-200 to-sky-200">
-                    <img className="flex-none w-28 h-28 rounded-full object-cover " src={res.avatar} alt="" />
+                  <div className="avatar">
+                    <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                      <img src={res.avatar} alt="" />
+                    </div>
                   </div>
                 </div>
+
                 <div className="text-center flex flex-col gap-1">
                   <p className="font-bold text-xl">{res.name}</p>
                   <span className="text-sm font-medium">{res.job}</span>
                   <p className=" divider text-sm mt-4 text-center font-semibold">Specialities</p>
                   <div className="card-actions  flex place-content-center">
-                    <div className="badge badge-outline badge-warning badge-md">PHP</div>
-                    <div className="badge badge-outline badge-warning badge-md">Node JS</div>
-                    <div className="badge badge-outline badge-warning badge-md">Solidity</div>
+                    <div className="badge badge-outline  badge-md">PHP</div>
+                    <div className="badge badge-outline  badge-md">Node JS</div>
+                    <div className="badge badge-outline  badge-md">Solidity</div>
                   </div>
                 </div>
               </div>

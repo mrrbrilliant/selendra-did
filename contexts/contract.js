@@ -31,12 +31,6 @@ export default function ContractProvider({ children }) {
     }
   }, [publicKey, network, setContractRO, contractRO]);
 
-  useEffect(() => {
-    if (contractRO) {
-      console.log(contractRO);
-    }
-  }, [contractRO]);
-
   const value = {
     contractRO,
     contractRW,

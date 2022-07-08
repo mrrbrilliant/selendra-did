@@ -11,6 +11,7 @@ import NotificationProvider from "../contexts/notification";
 import Sidebar from "../components/layouts/leftBar";
 import NotificationManager from "../components/notifications/manager";
 import UnlockWallet from "../components/wallet";
+import BalanceProvider from "../contexts/balance";
 
 export function SafeHydrate({ children }) {
   const [isSSR, setIsSSR] = useState(true);
@@ -40,13 +41,15 @@ function MyApp({ Component, pageProps }) {
           <NetworkProvider>
             <WalletProvider>
               <ContractProvider>
-                <DataProvider>
-                  <Sidebar>
-                    <NotificationManager />
-                    <UnlockWallet />
-                    <Component {...pageProps} />
-                  </Sidebar>
-                </DataProvider>
+                <BalanceProvider>
+                  <DataProvider>
+                    <Sidebar>
+                      <NotificationManager />
+                      <UnlockWallet />
+                      <Component {...pageProps} />
+                    </Sidebar>
+                  </DataProvider>
+                </BalanceProvider>
               </ContractProvider>
             </WalletProvider>
           </NetworkProvider>

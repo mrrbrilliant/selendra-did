@@ -1,73 +1,9 @@
-/* eslint-disable @next/next/no-img-element */
-// import { useEffect, useContext, useState } from "react";
-// import { useRouter } from "next/router";
-// import MainLayout from "../components/mainLayout";
-// import { ContractContext } from "../contexts/contract";
-// import { WalletContext } from "../contexts/wallet";
-
-// function Home() {
-//   const [num, setNum] = useState(-1);
-//   const {
-//     createOrg,
-//     countOrgByUser,
-//     deleteOrg,
-//     organizationLists,
-//     orgMeta,
-//     organizationListsByUser,
-//   } = useContext(ContractContext);
-
-//   const router = useRouter();
-
-//   async function count() {
-//     const c = await countOrgByUser();
-//     console.log(c);
-//   }
-
-//   return (
-//     <div classNameName="flex flex-row gap-4">
-//       <button
-//         classNameName="btn"
-//         onClick={() =>
-//           createOrg({
-//             name: "Nath Industry",
-//             description: "Porn website",
-//             orgUri: "https://nathindustry.com",
-//           })
-//         }
-//       >
-//         Create Org
-//       </button>
-//       <button classNameName="btn" onClick={count}>
-//         Count
-//       </button>
-
-//       <button classNameName="btn" onClick={() => organizationListsByUser()}>
-//         List
-//       </button>
-//       <input
-//         classNameName="input input-bordered"
-//         type="text"
-//         value={num}
-//         onChange={(e) => setNum(e.target.value)}
-//       />
-//       <button classNameName="btn" onClick={() => deleteOrg(num)}>
-//         deleteOrg
-//       </button>
-//       <button classNameName="btn" onClick={orgMeta}>
-//         Show
-//       </button>
-//     </div>
-//   );
-// }
-
-// Home.Layout = MainLayout;
-
-// export default Home;
-
 import React, { useContext, useEffect } from "react";
 import { WalletContext } from "../contexts/wallet";
 import Link from "next/link";
 import { DataContext } from "../contexts/data";
+import { BalanceContext } from "../contexts/balance";
+import { VscLock } from "react-icons/vsc";
 
 const ownerdata = [
   {
@@ -90,6 +26,7 @@ const ownerdata = [
   },
 ];
 const Home = () => {
+  const { balance } = useContext(BalanceContext);
   const { lockWallet, forgetWallet, wallet, publicKey, privateKey } = useContext(WalletContext);
   const { organizations } = useContext(DataContext);
   // const publicKey = wallet?.address || "";
@@ -110,9 +47,27 @@ const Home = () => {
               alt=""
             />
             <div>
-              <p className="font-bold text-xl">Marcia Hudson III</p>
-              <p className="mt-2 text-sm">{publicKey}</p>
-              <p className="mt-2 text-sm">{privateKey || "Locked"}</p>
+              <p className="font-bold text-xl mb-2">Marcia Hudson III</p>
+              <textarea className="w-full mb-2 text-sm resize-none font-mono" rows={1} value={publicKey} readOnly />
+              {privateKey && (
+                <textarea className="w-full mb-2 text-sm resize-none font-mono" value={privateKey} readOnly />
+              )}
+
+              <div className="flex space-x-2 justify-between">
+                <div>Balance</div>
+                <div className="text-sm flex place-content-center place-items-center space-x-2 font-mono">
+                  {parseFloat(balance).toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "SEL",
+                    maximumFractionDigits: 4,
+                  })}
+                  {!privateKey && (
+                    <span>
+                      <VscLock fontSize={16} />
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -170,13 +125,6 @@ const Home = () => {
                         <img className="flex-none w-14 h-14 rounded-full object-cover" src={res.logo} alt="" />
                         <p className="font-bold">{res.name}</p>
                       </div>
-                      {/* <div className="align-middle">
-                        <div className="py-2 flex items-center align-middle overflow-hidden">
-                          <div className=" border-t w-full border-gray-300"></div>
-                          <p className="mx-4 text-center">Report</p>
-                          <div className="w-full border-t border-gray-300"></div>
-                        </div>
-                      </div> */}
 
                       <div className="divider">Statistic</div>
                       <br />

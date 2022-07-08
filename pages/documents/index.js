@@ -1,16 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Image from "next/image";
-import MainLayout from "../components/mainLayout";
-import { DataContext } from "../contexts/data";
-import Modal from "../components/modal";
 
+import { DataContext } from "../../contexts/data";
+import Modal from "../../components/modal";
+import lodash from "lodash";
 import { ethers } from "ethers";
 import Link from "next/link";
 
 import { VscVerified, VscUnverified } from "react-icons/vsc";
-import { WalletContext } from "../contexts/wallet";
-import BtnWithAuth from "../hooks/useAuthCallback";
+import { WalletContext } from "../../contexts/wallet";
+import BtnWithAuth from "../../hooks/useAuthCallback";
 
 const initialState = {
   name: "",
@@ -59,7 +59,7 @@ function Claims() {
   return (
     <div className="-mt-10">
       <div>
-        <div className="grid grid-cols-2 mt-6 gap-6 ">
+        <div className="grid grid-cols-4 mt-6 gap-6 ">
           {documents &&
             documents.length > 0 &&
             documents.map((res, index) => {
@@ -69,7 +69,7 @@ function Claims() {
         {unVerifiedDocs.length > 0 && (
           <>
             <h1>Unverified</h1>
-            <div className="grid grid-cols-2 mt-6 gap-6 ">
+            <div className="grid grid-cols-4 mt-6 gap-6 ">
               {unVerifiedDocs &&
                 unVerifiedDocs.length > 0 &&
                 unVerifiedDocs.map((res, index) => {
@@ -96,13 +96,15 @@ const DocumentCard = ({ res }) => {
   const [transferTo, setTransferTo] = useState("");
   const [openTransfer, setOpenTransfer] = useState(false);
 
-  function toNumber(number) {
+  const [images, setImages] = useState([]);
+
+  const toNumber = useCallback((number) => {
     const toUnit = ethers.utils.formatEther(number).toString();
     const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
     return roundedCount;
-  }
+  }, []);
 
-  async function getCType() {
+  const getCType = useCallback(async () => {
     const id = toNumber(res.ctypeId);
     const ct = credentialTypes.filter((c) => c.id === id)[0];
 
@@ -126,48 +128,103 @@ const DocumentCard = ({ res }) => {
     setOrgDetail(org);
     setDocDetail(doc);
     setCType(ct);
-  }
+  }, [toNumber, credentialTypes, res, organizations, setTypeDetail, setOrgDetail, setDocDetail, setCType]);
 
-  useEffect(() => {
-    getCType();
-  }, []);
+  const findImage = useCallback(() => {
+    if (typeDetail && docDetail) {
+      Object.entries(typeDetail.properties).forEach((entry, index) => {
+        if (entry[1]["label"] && entry[1]["label"] === "Images") {
+          if (docDetail[entry[0]] && docDetail[entry[0]].length > 0) {
+            setImages([...images, ...docDetail[entry[0]]]);
+            // if (images.length === 0) {
+            //   setImages([...images, ...docDetail[entry[0]]]);
+            // }
+          }
+        }
+      });
 
-  useEffect(() => {
-    if (typeDetail) {
-      console.log("typeDetail", typeDetail);
+      // if (images.length === 0) {
+      //   setImages(typeDetail.images);
+      // }
     }
-  }, [typeDetail]);
+  }, [typeDetail, docDetail, images, setImages]);
 
   useEffect(() => {
-    if (docDetail) {
-      console.log("docDetail", docDetail);
+    if (!cType) {
+      getCType();
     }
-  }, [docDetail]);
+  }, [getCType, cType]);
 
   useEffect(() => {
-    if (cType) {
-      console.log("cType", cType);
+    if (typeDetail && docDetail && images.length === 0) {
+      findImage();
     }
-  }, [cType]);
+  }, [typeDetail, docDetail, findImage, images]);
 
-  useEffect(() => {
-    console.log("res", res);
-  }, [res]);
+  // useEffect(() => {
+  //   if (typeDetail) {
+  //     console.log("typeDetail", typeDetail);
+  //   }
+  // }, [typeDetail]);
+
+  // useEffect(() => {
+  //   if (docDetail) {
+  //     console.log("docDetail", docDetail);
+  //   }
+  // }, [docDetail]);
+
+  // useEffect(() => {
+  //   if (cType) {
+  //     console.log("cType", cType);
+  //   }
+  // }, [cType]);
+
+  // useEffect(() => {
+  //   console.log("res", res);
+  // }, [res]);
 
   return (
-    <div className=" rounded-lg p-6  border-gray-100 bg-white relative overflow-hidden">
+    <div className=" rounded-2xl p-4 border-gray-100 bg-white relative overflow-hidden">
       <div className="flex flex-col place-items-start place-content-start">
-        {typeDetail && typeDetail.images && (
-          <div className="w-full  h-max flex place-content-center place-items-center mb-4">
-            <img className="w-auto max-h-64" src={typeDetail.images[0]} alt="" />
+        {images.length > 0 && (
+          <div className="w-full  h-max flex place-content-center place-items-center mb-4 rounded-xl overflow-hidden">
+            <img className="w-auto max-h-64" src={images[0]} alt="" />
           </div>
         )}
-        <div className="w-full flex flex-col flex-grow space-y-2">
-          <h4 className="text-2xl font-semibold">{res.name}</h4>
-          <Badge status={res.status} />
-          <div className="font-normal text-sm">BY: {orgDetail?.name}</div>
-          <textarea className="w-full mt-2 focus:outline-none resize-none" readOnly value={res.propertyHash} />
 
+        {images.length === 0 && typeDetail && typeDetail.images && (
+          <div className="w-full  h-max flex place-content-center place-items-center mb-4">
+            <img className="w-auto max-h-64" src={images[0]} alt="" />
+          </div>
+        )}
+
+        <div className="w-full flex flex-col flex-grow space-y-4">
+          <div>
+            <Badge status={res.status} />
+            <h4 className="text-xl font-semibold uppercase">{res.name}</h4>
+            <div className="font-bold text-xs text-gray-500">{orgDetail?.name}</div>
+          </div>
+          <textarea
+            className="w-full mt-2 focus:outline-none resize-none text-xs font-mono "
+            readOnly
+            value={res.propertyHash}
+          />
+
+          <div className="grid grid-cols-3 text-xs">
+            {typeDetail &&
+              docDetail &&
+              Object.entries(typeDetail.properties).map(
+                (e, i) =>
+                  i < 3 && (
+                    <React.Fragment key={e[0]}>
+                      {e[1]["label"] !== "Images" && <div> {lodash.startCase(e[0])}</div>}
+                      {e[1]["label"] !== "Images" && (
+                        <div className="col-span-2 font-medium uppercase">{docDetail[e[0]]}</div>
+                      )}
+                    </React.Fragment>
+                  )
+              )}
+          </div>
           {openTransfer && (
             <>
               <textarea
@@ -201,12 +258,13 @@ const DocumentCard = ({ res }) => {
           )}
           {!openTransfer && (
             <div className="flex space-x-2">
-              <button className="p-2 text-white w-32 leading-none rounded font-bold mt-2 bg-primarypink hover:bg-opacity-75 text-xs uppercase">
-                Detail
-              </button>
+              {typeDetail && Object.entries(typeDetail.properties).length > 3 && (
+                <button className="p-2 flex-grow btn btn-secondary btn-sm text-xs uppercase">Detail</button>
+              )}
+
               {cType && cType.transferable && (
                 <BtnWithAuth
-                  className="p-2 text-white w-32 leading-none rounded font-bold mt-2 bg-primarypink hover:bg-opacity-75 text-xs uppercase"
+                  className="p-2 flex-grow text-white w-32 leading-none rounded font-bold mt-2 bg-primarypink hover:bg-opacity-75 text-xs uppercase"
                   callback={() => {
                     setOpenTransfer(true);
                   }}

@@ -1,23 +1,24 @@
-/* @import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Gulzar&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Mingzat&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,400;1,700&display=swap"); */
+/* @import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;400;700&display=swap"); */
+/* @import url("https://fonts.googleapis.com/css2?family=Gulzar&display=swap"); */
+/* @import url("https://fonts.googleapis.com/css2?family=Mingzat&display=swap"); */
+/* @import url("https://fonts.googleapis.com/css2?family=Lora,wght@1,400;1,700&display=swap"); */
 /* @import url("https://fonts.googleapis.com/css2?family=Trispace:wght@200;400;800&display=swap"); */
-@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@200;400;700;900&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Archivo:wght@200;400;700;900&display=swap"); */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 html,
 body {
-  font-family: "Archivo", sans-serif;
-  @apply min-h-screen h-auto bg-base-300;
+  font-family: "Inter", sans-serif;
+  @apply h-max bg-base-300;
 }
-[data-theme="*"] {
+/* [data-theme="*"] {
   transition: 1s ease-in-out;
-}
+} */
 
-.table * {
+/* .table * {
   border-radius: 0 !important ;
 }
 
@@ -28,7 +29,7 @@ body {
 .table input:focus,
 .table select:focus {
   outline: none !important;
-}
+} */
 
 select {
   appearance: none !important;
