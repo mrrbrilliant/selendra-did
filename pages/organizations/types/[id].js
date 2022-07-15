@@ -275,7 +275,7 @@ const CreateType = () => {
         <h1 className="font-bold">Create Documents Template</h1>
 
         <br />
-        <div className="bg-white px-8 py-8 rounded-lg">
+        <div className="bg-base-100 px-8 py-8 rounded-lg">
           <form>
             <div>
               <label className="font-semibold text-accent">Title</label>

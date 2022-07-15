@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import Link from "next/link";
 import Modal from "../../components/modal";
 import { v4 as uid } from "uuid";
@@ -28,16 +28,16 @@ const Organizations = () => {
   const [createModalOpendoc, setCreateModalOpendoc] = useState(false);
   const [createModalOpenType, setCreateModalOpenType] = useState(false);
 
+  const [extension, setExtension] = useState({
+    logo: "",
+    website: "",
+  });
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+
   function toggleCreateOpenModal() {
     setCreateModalOpen(!createModalOpen);
   }
-  function toggleCreateOpenModaldoc() {
-    setCreateModalOpendoc(!createModalOpendoc);
-  }
 
-  function toggleCreateOpenModalType() {
-    setCreateModalOpenType(!createModalOpenType);
-  }
   const [createOrgForm, setCreateOrgForm] = useState({
     name: "",
     description: "",
@@ -55,61 +55,89 @@ const Organizations = () => {
     expirable: false,
     lifespan: 0,
   });
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setCreateOrgForm({ ...createOrgForm, [name]: value });
-    console.log(e.target.value);
-  }
 
-  function handleChangeDoc(e) {
+  function handleExtensionChange(e) {
     const { name, value } = e.target;
-    setState({ ...state, [name]: value });
-    console.log(e.target.value);
-  }
-  function handleChangeType(e) {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox") {
-      setCreateCtypeForm({ ...createCtypeForm, [name]: checked });
+    if (name === "website") {
+      setExtension({ ...extension, [name]: value });
       return;
     }
-    setCreateCtypeForm({ ...createCtypeForm, [name]: value });
-    console.log(value);
+
+    if (name === "logo") {
+      const { files } = e.target;
+
+      if (files.length === 0) return;
+
+      setIsUploadingImages(true);
+
+      let formData = new FormData();
+      formData.append("logo", files[0], files[0].name);
+
+      var requestOptions = {
+        method: "POST",
+        body: formData,
+      };
+
+      return fetch("https://gateway.kumandra.org/api/add", requestOptions)
+        .then((response) => response.text())
+        .then((response) => {
+          const data = response.split("\n");
+
+          let urls = [];
+          for (let i = 0; i < data.length; i++) {
+            if (data[i] !== "") {
+              let _d = JSON.parse(data[i]);
+              urls.push(`https://gateway.kumandra.org/files/${_d.Hash}`);
+            }
+          }
+          setExtension({ ...extension, [name]: urls[0] });
+        })
+        .catch((error) => null);
+    }
   }
 
-  function handleCreateOrg(e) {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCreateOrgForm({ ...createOrgForm, [name]: value });
+  };
+
+  const handleCreateOrg = (e) => {
     e.preventDefault();
+
     toggleCreateOpenModal();
     createOrg({ ...createOrgForm });
-  }
+  };
 
-  function toNumber(number) {
-    const toUnit = ethers.utils.formatEther(number).toString();
-    const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
-    return roundedCount;
-  }
-
-  useEffect(() => {
-    console.log(JSON.stringify(createOrgForm, null, 4));
-  }, [createOrgForm]);
-
-  const otherOrgs = organizations.filter(function (array_el) {
-    return (
-      ownOrganizations.filter(function (anotherOne_el) {
-        return anotherOne_el.name == array_el.name;
-      }).length == 0
-    );
-  });
+  const otherOrgs = () => {
+    return organizations.filter(function (array_el) {
+      return (
+        ownOrganizations.filter(function (anotherOne_el) {
+          return anotherOne_el.name == array_el.name;
+        }).length == 0
+      );
+    });
+  };
 
   useEffect(() => {
-    console.log(organizations);
-  }, [organizations]);
+    setCreateOrgForm({ ...createOrgForm, orgUri: JSON.stringify(extension) });
+  }, [extension, setCreateOrgForm]);
 
   return (
     <>
       {/* =================>create orgaization Modal<================== */}
       <Modal open={createModalOpen} toggle={toggleCreateOpenModal}>
         <form className="form-control w-full" onSubmit={handleCreateOrg}>
+          {extension.logo && (
+            <div className="w-full absolute -top-20 left-0 flex place-items-center place-content-center">
+              <div className="avatar">
+                <div className="w-28 rounded-full ring-4 ring-primary ring-offset-base-100 ring-offset-4">
+                  <img src={extension.logo} alt="" />
+                </div>
+              </div>
+            </div>
+          )}
           {/* name */}
+
           <label className="label">
             <span className="label-text text-lg">What is your organization name?</span>
           </label>
@@ -128,223 +156,44 @@ const Organizations = () => {
           <textarea
             className="  h-24 bg-gray-200 w-full p-2 rounded text-black"
             placeholder="Interoperable Nominated Proof-of-Stake network for developing and running Substrate-based and EVM compatible blockchain applications."
-            defaultValue={""}
             name="description"
-            // value={createOrgForm.description}
+            value={createOrgForm.description}
             onChange={handleChange}
             maxLength={168}
           />
-          {/* orgUri */}
+          {/* USE orgUri as ipfs link to extend organization information */}
+          {/* Profile images */}
           <label className="label">
-            <span className="label-text text-lg">Link to your organization</span>
+            <span className="label-text text-lg">Your organization website</span>
           </label>
           <input
             type="text"
             placeholder="https://selendra.org"
             className="bg-gray-200 w-full p-2 rounded text-black"
-            name="orgUri"
-            // value={createOrgForm.orgUri}
-            onChange={handleChange}
+            name="website"
+            onChange={handleExtensionChange}
           />
-          <input type="submit" className="btn mt-4" value="Create" />
-        </form>
-      </Modal>
-
-      {/* =====================>Modal create doc<<================= */}
-
-      <Modal open={createModalOpendoc} toggle={toggleCreateOpenModaldoc}>
-        <form
-          className="form-control w-full"
-          //   onSubmit={handleCreateOrg}
-        >
           <label className="label">
-            <span className="label-text text-lg">Organization</span>
+            <span className="label-text text-lg">Your organization logo</span>
           </label>
           <input
-            type="text"
-            placeholder="Type here"
+            type="file"
+            placeholder="https://selendra.org"
             className="bg-gray-200 w-full p-2 rounded text-black"
-            name="name"
-            // value={createOrgForm.name}
-            onChange={handleChangeDoc}
+            name="logo"
+            onChange={handleExtensionChange}
           />
-          <label className="label mt-3">
-            <span className="label-text text-lg">Type</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Type here"
-            className="bg-gray-200 w-full p-2 rounded text-black"
-            name="type"
-            // value={createOrgForm.name}
-            onChange={handleChangeDoc}
-          />
-          <label className="label mt-3">
-            <span className="label-text text-lg">Document URL</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Type here"
-            className="bg-gray-200 w-full p-2 rounded text-black"
-            name="docURL"
-            // value={createOrgForm.name}
-            onChange={handleChangeDoc}
-          />
-          <label className="label mt-3">
-            <span className="label-text text-lg">Document Hash</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Type here"
-            className="bg-gray-200 w-full p-2 rounded text-black"
-            name="docHash"
-            // value={createOrgForm.name}
-            onChange={handleChangeDoc}
-          />
-          <label className="label mt-3">
-            <span className="label-text text-lg">OwnerId</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Type here"
-            className="bg-gray-200 w-full p-2 rounded text-black"
-            name="ownerId"
-            // value={createOrgForm.name}
-            onChange={handleChangeDoc}
-          />
-          <input type="submit" className="btn mt-4" value="Create" />
-        </form>
-      </Modal>
-
-      {/* //====================>Modal Doctype<<==================== */}
-      <Modal open={createModalOpenType} toggle={toggleCreateOpenModalType}>
-        <form
-          className="form-control w-full"
-          //   onSubmit={handleCreateCtype}
-        >
-          <label className="label">
-            <span className="label-text text-lg">Organization</span>
-          </label>
-          <div className="dropdown w-full mb-4">
-            <label tabIndex={0} className="input-group input m-0 p-0">
-              <input
-                name="organizationId"
-                type="text"
-                placeholder="Type"
-                className=" bg-gray-200 w-full p-2 rounded text-black"
-                readOnly={true}
-              />
-              <span className="bg-transparent">
-                <VscChevronDown />
-              </span>
-            </label>
-          </div>
-          <label className="label">
-            <span className="label-text text-lg">Schema URL</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Type here"
-            className="bg-gray-200 w-full p-2 rounded text-black mb-4"
-            name="propertiesURI"
-            // value={createCtypeForm.propertiesURI}
-            onChange={handleChangeType}
-          />
-          <label className="label ">
-            <span className="label text-lg">Schema hash</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Type here"
-            className="bg-gray-200 w-full p-2 rounded text-black mb-4"
-            name="propertiesHash"
-            onChange={handleChangeType}
-            // value={createCtypeForm.propertiesHash}
-            readOnly={true}
-          />
-          <div>
-            <label className="cursor-pointer label">
-              <span className="label-text text-base">Expirable</span>
-              <input
-                type="checkbox"
-                className="checkbox checkbox-accent"
-                name="expirable"
-                // checked={createCtypeForm.expirable}
-                onChange={handleChangeType}
-              />
-            </label>
-          </div>
-
-          <div>
-            <label className="cursor-pointer label">
-              <span className="label-text text-base">Transferable</span>
-              <input
-                type="checkbox"
-                className="checkbox checkbox-accent"
-                name="transferable"
-                // checked={createCtypeForm.transferable}
-                onChange={handleChangeType}
-              />
-            </label>
-            <label className="cursor-pointer label">
-              <span className="label-text text-base">Revokable</span>
-              <input
-                type="checkbox"
-                className="checkbox checkbox-accent"
-                name="revokable"
-                // checked={createCtypeForm.revokable}
-                onChange={handleChangeType}
-              />
-            </label>
-          </div>
+          {/* Org website */}
           <input type="submit" className="btn mt-4" value="Create" />
         </form>
       </Modal>
 
       <div className="flex justify-end -mt-9 rounded-xl space-x-4">
-        {/* <label
-          onClick={() => {
-            toggleCreateOpenModal();
-          }}
-          className="btn bg-accent rounded-xl modal-button"
-        >
-          Unlock CB
-        </label> */}
-        {/* <label
-          onClick={(e) => {
-            if (wallet) {
-              toggleCreateOpenModal();
-            } else {
-              const cb = () => toggleCreateOpenModal();
-              setCb(() => cb);
-              toggleRequest();
-            }
-          }}
-          className="btn bg-accent rounded-xl modal-button"
-          htmlFor="my-modal-3"
-        >
-          Create Organizations
-        </label> */}
-
-        <BtnWithAuth callback={toggleCreateOpenModal}>
+        <BtnWithAuth callback={toggleCreateOpenModal} className="">
           <label className="btn bg-accent rounded-xl modal-button">Create Organizations</label>
         </BtnWithAuth>
-
-        {/* <label
-          onClick={toggleCreateOpenModaldoc}
-          className="btn bg-accent rounded-xl modal-button ml-2"
-          htmlFor="my-modal-3"
-        >
-          Create Documents
-        </label>
-        <label
-          onClick={toggleCreateOpenModalType}
-          className="btn bg-accent rounded-xl modal-button ml-2"
-          htmlFor="my-modal-3"
-        >
-          Create Documents Type
-        </label> */}
       </div>
+
       {/* ===================owner Organization======================= */}
       <div className="mb-8">
         <div>
@@ -354,15 +203,16 @@ const Organizations = () => {
           {ownOrganizations &&
             ownOrganizations.map((org, index) => {
               return (
-                <div key={index} className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
+                <div key={index} className="w-auto bg-base-100 p-4 rounded-xl transform transition-all duration-300">
                   <div className="flex items-center space-x-4">
                     <Image
                       className="flex-none w-14 h-14 rounded-full object-cover"
-                      src="https://avatars.githubusercontent.com/u/49308834?s=200&v=4"
-                      width={56}
-                      height={56}
+                      src={JSON.parse(org.uri)["logo"] || `https://avatars.dicebear.com/api/male/${org.name}.svg`}
+                      width={96}
+                      height={96}
                       alt=""
                     />
+
                     <p className="font-bold">{org.name}</p>
                   </div>
                   <div className="align-middle">
@@ -402,15 +252,16 @@ const Organizations = () => {
       </div>
 
       {/* =========================>other orgaization======================= */}
+
       <div>
         <h3 className="font-bold">Other Organizations</h3>
       </div>
       <div className="grid grid-cols-4 gap-7 mt-4">
         {organizations &&
           ownOrganizations &&
-          otherOrgs.map((org, index) => {
+          otherOrgs().map((org, index) => {
             return (
-              <div key={index} className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
+              <div key={index} className="w-auto bg-base-100 p-4 rounded-xl transform transition-all duration-300">
                 <div className="flex items-center space-x-4">
                   <Image
                     className="flex-none w-14 h-14 rounded-full object-cover"

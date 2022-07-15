@@ -233,7 +233,6 @@ export default function DataProvider({ children }) {
           // @ts-ignore
           const type = await fetchCtypesByOrg({ orgId: org.id });
           if (type) {
-            console.log(type);
             // @ts-ignore
             setCredentialTypes((prev) => {
               const data = [...prev, ...type];
@@ -516,10 +515,6 @@ export default function DataProvider({ children }) {
       transferEvent();
     }
   }, [transferEvent, contractRO, publicKey, initialBlock]);
-
-  useEffect(() => {
-    console.log(credentialTypes);
-  }, [credentialTypes]);
 
   useEffect(() => {
     if (!checkingAuth && publicKey && contractRO && !isOrgLoading && isCTLoading) {

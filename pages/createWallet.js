@@ -49,7 +49,7 @@ export default function CreateWallet() {
 
   return (
     <div className="w-full min-h-screen flex place-items-center place-content-center">
-      <div className="card w-96 shadow-xl p-6 bg-base-300">
+      <div className="card w-96 shadow-xl p-6 bg-base-100">
         <div className="card-body p-0">
           <a className="label font-bold">CREATE WALLET</a>
           <form className="form-control w-full" onSubmit={handleSubmit}>

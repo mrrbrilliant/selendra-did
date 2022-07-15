@@ -193,7 +193,7 @@ const TypeCard = ({ type, isOwnOrg }) => {
   }
 
   return (
-    <div className=" rounded-lg p-3  border-gray-100 bg-white">
+    <div className=" rounded-lg p-3  border-gray-100 bg-base-100">
       <div className="flex space-x-4 p-4">
         <div className="w-40 h-40 text-center">
           <Image
@@ -321,7 +321,7 @@ const DocumentCard = ({ res }) => {
   }, [res]);
 
   return (
-    <div className=" rounded-lg p-6  border-gray-100 bg-white relative overflow-hidden">
+    <div className=" rounded-lg p-6  border-gray-100 bg-base-100 relative overflow-hidden">
       <div className="flex flex-col place-items-start place-content-start">
         {typeDetail && typeDetail.images && (
           <div className="w-full  h-max flex place-content-center place-items-center mb-4">
@@ -332,9 +332,7 @@ const DocumentCard = ({ res }) => {
           <h4 className="text-2xl font-semibold">{res.name}</h4>
           <Badge status={res.status} />
           <div className="font-normal text-sm">BY: {orgDetail?.name}</div>
-          <textarea className="w-full mt-2 focus:outline-none resize-none" readOnly>
-            {res.propertyHash}
-          </textarea>
+          <textarea className="w-full mt-2 focus:outline-none resize-none" value={res.propertyHash} readOnly />
           <div className="flex space-x-4">
             <button className="p-2 flex-grow text-white leading-none rounded font-bold mt-2 btn btn-info btn-sm hover:bg-opacity-75 text-xs uppercase">
               Detail

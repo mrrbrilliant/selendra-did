@@ -13,6 +13,7 @@ const nextConfig = {
       "upload.wikimedia.org",
       "media-exp2.licdn.com",
       "gateway.kumandra.org",
+      "cloudflare-ipfs.com",
     ],
     dangerouslyAllowSVG: true,
   },

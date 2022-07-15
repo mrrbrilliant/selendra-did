@@ -272,12 +272,13 @@ export default function Docs() {
       const validator = new ZSchema({
         ignoreUnresolvableReferences: true,
         noEmptyStrings: true,
-        noExtraKeywords: true,
+        noExtraKeywords: false,
       });
 
       const valid = validator.validate(others, schema);
       const _errors = validator.getLastErrors();
       if (_errors) {
+        console.log(_errors);
         invalids.push(data[row]);
       }
       if (valid) {
@@ -435,9 +436,33 @@ export default function Docs() {
         data.push(obj);
       }
 
+      let keys = [];
+      Object.keys(schema.properties).forEach((property) => {
+        const t = schema["properties"][property]["type"];
+        if (t === "array") {
+          keys.push(property);
+        }
+      });
+
+      if (keys.length === 0) {
+        return;
+      }
+
+      for (let key = 0; key < keys.length; key++) {
+        for (let d = 0; d < data.length; d++) {
+          const row = data[d][keys[key]];
+
+          const isarray = Array.isArray(row);
+
+          if (isarray) continue;
+          const _row = row.split(",").filter((r) => r !== "");
+          data[d][keys[key]] = _row;
+        }
+      }
+
       setBulkData(data);
     }
-  }, [csvContent]);
+  }, [csvContent, schema]);
 
   useEffect(() => {
     if (!wallet && !show) {
@@ -446,18 +471,28 @@ export default function Docs() {
   }, [wallet, toggleRequest, show]);
 
   // useEffect(() => {
-  //   console.log(formData);
-  // }, [formData]);
+  //   let keys = [];
+  //   Object.keys(schema.properties).forEach((property) => {
+  //     const t = schema[property]["type"];
+  //     if (t === "array") {
+  //       keys.push(t);
+  //     }
+  //   });
 
-  // useEffect(() => {
-  //   console.log(errors);
-  // }, [errors]);
+  //   if(keys.length === 0) {
+  //     return
+  //   }
+
+  //   keys.forEach((k) => {
+
+  //   })
+  // }, [schema]);
 
   return (
     <div className="w-full">
-      <div className="flex place-content-between place-items-center">
+      <div className="flex place-content-between place-items-center mb-10">
         <h1 className="uppercase font-bold text-xl">{document.name}</h1>
-        <label className="btn" htmlFor="csv">
+        <label className="btn btn-info" htmlFor="csv">
           Import CSV
         </label>
       </div>
@@ -465,27 +500,24 @@ export default function Docs() {
       {bulkData.length === 0 && (
         <div>
           <label className="label" htmlFor="to">
-            <span className="label-text uppercase">Owner address</span>
+            <span className="label-text uppercase font-bold">Owner address</span>
+            <span className="label-text-alt font-mono">0X000000000000000000000000000000000000</span>
           </label>
           <input
-            className="input input-bordered w-full"
+            className="input input-bordered w-full font-mono"
             type="text"
             name="to"
             value={document.to}
             onChange={handleDocChange}
             disabled={!isOwnOrg}
           />
-          <label className="label" htmlFor="to">
-            <span className="label-text">0X000000000000000000000000000000000000</span>
-          </label>
+          <label className="label" htmlFor="to"></label>
           <input
             id="csv"
             name="csv"
             className="input input-bordered w-full hidden"
             type="file"
             accept=".csv"
-            // value={document.to}
-            // disabled={!isOwnOrg}
             onChange={handleSelectFiles}
           />
         </div>
@@ -495,9 +527,10 @@ export default function Docs() {
         formUi?.properties &&
         Object.keys(formUi?.properties).map((key) => {
           return (
-            <div key={key}>
+            <div key={key} className="mb-4">
               <label className="label" htmlFor={key}>
-                <span className="label-text uppercase">{key}</span>
+                <span className="label-text uppercase font-bold">{key}</span>
+                <span className="label-text-alt">{formUi?.properties[key]?.description}</span>
               </label>
 
               <InputType
@@ -506,9 +539,6 @@ export default function Docs() {
                 value={formData[key]}
                 handleFormChange={handleFormChange}
               />
-              <label className="label" htmlFor={key}>
-                <span className="label-text">{formUi?.properties[key]?.description}</span>
-              </label>
             </div>
           );
         })}
@@ -521,15 +551,15 @@ export default function Docs() {
         ))}
 
       {bulkData.length > 0 && (
-        <div className="w-full flex justify-end space-x-4">
+        <div className="w-full flex justify-end space-x-4 mt-8">
           {isOwnOrg && (
-            <button className="btn" onClick={() => bulkCreate(bulkData)}>
+            <button className="btn btn-block btn-primary" onClick={() => bulkCreate(bulkData)}>
               Create all
             </button>
           )}
 
           {!isOwnOrg && (
-            <button className="btn" onClick={handleSubmitDoc}>
+            <button className="btn btn-block btn-primary" onClick={handleSubmitDoc}>
               Submit All
             </button>
           )}
@@ -537,15 +567,15 @@ export default function Docs() {
       )}
 
       {bulkData.length === 0 && (
-        <div className="w-full flex justify-end space-x-4">
+        <div className="w-full flex justify-end space-x-4 mt-8">
           {isOwnOrg && (
-            <button className="btn" onClick={handleCreateDoc}>
+            <button className="btn btn-block btn-primary" onClick={handleCreateDoc}>
               Create
             </button>
           )}
 
           {!isOwnOrg && (
-            <button className="btn" onClick={handleSubmitDoc}>
+            <button className="btn btn-block btn-primary" onClick={handleSubmitDoc}>
               Submit Request
             </button>
           )}

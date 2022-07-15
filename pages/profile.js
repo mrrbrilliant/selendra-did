@@ -106,7 +106,7 @@ const Profile = () => {
         {!isCheckingUser && !userAddress && <div>User not found</div>}
         {!isCheckingUser && userAddress && personalInfo && <pre>{JSON.stringify(personalInfo, null, 4)}</pre>}
         {/* <div className="md:col-span-1">
-          <div className="bg-white p-4 rounded-xl">
+          <div className="bg-base-100 p-4 rounded-xl">
             <img
               className="w-36 h-36 rounded-full border-gray-600 border-2"
               src="https://media-exp2.licdn.com/dms/image/C5603AQGp30P66iCXnA/profile-displayphoto-shrink_200_200/0/1628153693733?e=1661385600&v=beta&t=1R1QizZvXLugYKkUaSBU5SxGIQb5dQ9l2nUpBMoKwTo"
@@ -114,7 +114,7 @@ const Profile = () => {
             <p className="font-bold mt-2 ">Sam MuEL</p>
           </div>
 
-          <div className="mt-4 bg-white p-4 rounded-xl">
+          <div className="mt-4 bg-base-100 p-4 rounded-xl">
             <h1 className="uppercase font-bold mb-3">Education</h1>
             <div className="text-sm font-medium mb-2 flex items-center space-x-2">
               <img
@@ -130,7 +130,7 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="mt-4 bg-white p-4 rounded-xl">
+          <div className="mt-4 bg-base-100 p-4 rounded-xl">
             <h1 className="uppercase font-bold mb-3">Skill</h1>
             <div className="card-actions mt-4">
               <span className="text-center  px-2 py-1 bg-gray-700 bg-opacity-80 hover:bg-opacity-75 rounded-full text-sm font-semibold text-white">
@@ -145,7 +145,7 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="mt-4 bg-white p-4 rounded-xl">
+          <div className="mt-4 bg-base-100 p-4 rounded-xl">
             <h1 className="uppercase font-bold mb-3">Experience</h1>
             <div>
               <ul className=" text-sm font-medium ">
@@ -165,7 +165,7 @@ const Profile = () => {
               <div className="grid grid-cols-3 gap-7 mt-4">
                 {ownerdata.map((res) => {
                   return (
-                    <div className="w-auto bg-white p-4 rounded-xl transform transition-all duration-300">
+                    <div className="w-auto bg-base-100 p-4 rounded-xl transform transition-all duration-300">
                       <div className="flex items-center space-x-4">
                         <img className="flex-none w-14 h-14 rounded-full object-cover" src={res.logo} />
                         <p className="font-bold">{res.name}</p>

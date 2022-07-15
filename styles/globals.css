@@ -14,23 +14,55 @@ body {
   font-family: "Inter", sans-serif;
   @apply h-max bg-base-300;
 }
-/* [data-theme="*"] {
-  transition: 1s ease-in-out;
-} */
-
-/* .table * {
-  border-radius: 0 !important ;
-}
-
-.table input {
-  @apply py-0 px-1;
-}
-
-.table input:focus,
-.table select:focus {
-  outline: none !important;
-} */
 
 select {
   appearance: none !important;
+}
+
+.scanbox {
+  width: 350px;
+  height: 350px;
+  /* margin: 20px;
+outline: 2px solid;
+outline-offset: 10px; */
+  position: relative;
+}
+.scanbox::before {
+  height: 350px;
+  content: "";
+  position: absolute;
+  top: 0;
+  z-index: 50;
+  bottom: 0;
+  left: calc(50% - 175px);
+  width: 10px;
+  clip-path: inset(0);
+  animation: x 750ms ease-in-out infinite alternate, y 1500ms ease-in-out infinite, z 165ms ease-in-out infinite;
+  @apply bg-error shadow-error;
+}
+
+@keyframes x {
+  to {
+    transform: translateX(-185px);
+    left: calc(50% + 360px);
+  }
+}
+
+@keyframes y {
+  33% {
+    clip-path: inset(0 0 0 -10px);
+  }
+  50% {
+    clip-path: inset(0 0 0 0);
+  }
+  83% {
+    clip-path: inset(0 -10px 0 0);
+  }
+}
+
+@keyframes z {
+  to {
+    /* opacity: 25%; */
+    width: 1px;
+  }
 }

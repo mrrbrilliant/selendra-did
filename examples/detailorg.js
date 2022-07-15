@@ -77,7 +77,7 @@ const Detailorg = () => {
       <div className="grid grid-cols-2 mt-3 gap-7">
         {data.map((res) => {
           return (
-            <div className=" rounded-lg p-3  border-gray-100 bg-white">
+            <div className=" rounded-lg p-3  border-gray-100 bg-base-100">
               <div className="grid md:grid-cols-5 gap-10">
                 <div className="md:col-span-2">
                   {/* <div

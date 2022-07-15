@@ -44,7 +44,7 @@ export default function MainLayout({ children }) {
     //   </div>
     // </div>
     <div className="flex">
-      <div className={` ${open ? "w-72" : "w-20 "} bg-white h-screen p-5  pt-8 relative duration-300`}>
+      <div className={` ${open ? "w-72" : "w-20 "} bg-base-100 h-screen p-5  pt-8 relative duration-300`}>
         <img
           src="/images/control.png"
           className={`absolute cursor-pointer -right-3 top-9 w-7 border-dark-purple

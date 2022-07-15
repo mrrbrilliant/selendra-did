@@ -40,7 +40,7 @@ const getDocs = async (address) => {
 export default async function handler(req, res) {
   const { user } = req.query;
   const data = await getDocs(user);
-  const doc = data.filter((d) => d.name === "Public Identity");
+  const doc = data.filter((d) => d.name === "Master Digital ID");
 
   const propertyURI = doc[0].propertyURI;
   const info = await fetch(propertyURI).then((res) => res.json());

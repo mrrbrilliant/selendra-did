@@ -131,7 +131,7 @@ function CreateCTypes() {
           name="description"
           value={scheme.description}
           onChange={handleChange}
-        ></textarea>
+        />
       </div>
       <div className="form-control w-full">
         <label className="label">
