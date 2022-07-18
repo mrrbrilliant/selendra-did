@@ -89,14 +89,16 @@ export default function BalanceProvider({ children }) {
   }, [network, publicKey]);
 
   useEffect(() => {
-    network.on("block", async (blockNumber) => {
-      const blockData = await network.getBlockWithTransactions(blockNumber);
-      const txs = blockData.transactions;
-      const myTx = txs.filter((tx) => tx.to === publicKey || tx.from === publicKey);
-      if (myTx.length > 0) {
-        fetchBalance();
-      }
-    });
+    if (network && publicKey) {
+      network.on("block", async (blockNumber) => {
+        const blockData = await network.getBlockWithTransactions(blockNumber);
+        const txs = blockData.transactions;
+        const myTx = txs.filter((tx) => tx.to === publicKey || tx.from === publicKey);
+        if (myTx.length > 0) {
+          fetchBalance();
+        }
+      });
+    }
   }, [network, publicKey, fetchBalance]);
 
   const value = {

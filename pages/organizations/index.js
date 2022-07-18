@@ -144,9 +144,9 @@ const Organizations = () => {
           <input
             type="text"
             placeholder="Selendra"
-            className="bg-gray-200 w-full p-2 rounded text-black"
+            className=" w-full p-2 rounded input input-bordered autofill:bg-transparent"
             name="name"
-            // value={createOrgForm.name}
+            value={createOrgForm.name}
             onChange={handleChange}
           />
           {/* description */}
@@ -154,12 +154,12 @@ const Organizations = () => {
             <span className="label-text text-lg">Describe your orgaization.</span>
           </label>
           <textarea
-            className="  h-24 bg-gray-200 w-full p-2 rounded text-black"
+            className="h-24 w-full p-2 rounded input input-bordered autofill:bg-transparent"
             placeholder="Interoperable Nominated Proof-of-Stake network for developing and running Substrate-based and EVM compatible blockchain applications."
             name="description"
             value={createOrgForm.description}
             onChange={handleChange}
-            maxLength={168}
+            maxLength={512}
           />
           {/* USE orgUri as ipfs link to extend organization information */}
           {/* Profile images */}
@@ -169,7 +169,7 @@ const Organizations = () => {
           <input
             type="text"
             placeholder="https://selendra.org"
-            className="bg-gray-200 w-full p-2 rounded text-black"
+            className=" w-full p-2 rounded input input-bordered autofill:bg-transparent"
             name="website"
             onChange={handleExtensionChange}
           />
@@ -179,18 +179,18 @@ const Organizations = () => {
           <input
             type="file"
             placeholder="https://selendra.org"
-            className="bg-gray-200 w-full p-2 rounded text-black"
+            className="input input-bordered w-full flex place-content-center h-full p-2 rounded autofill:bg-transparent"
             name="logo"
             onChange={handleExtensionChange}
           />
           {/* Org website */}
-          <input type="submit" className="btn mt-4" value="Create" />
+          <input type="submit" className="btn btn-primary mt-4" value="Create" />
         </form>
       </Modal>
 
       <div className="flex justify-end -mt-9 rounded-xl space-x-4">
         <BtnWithAuth callback={toggleCreateOpenModal} className="">
-          <label className="btn bg-accent rounded-xl modal-button">Create Organizations</label>
+          <label className="btn btn-primary rounded-xl modal-button">Create Organizations</label>
         </BtnWithAuth>
       </div>
 

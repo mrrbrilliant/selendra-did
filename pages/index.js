@@ -26,13 +26,13 @@ const Home = () => {
   // contexts
   const { balance, transfer } = useContext(BalanceContext);
   const { publicKey, privateKey, wallet, checkingAuth } = useContext(WalletContext);
-  const { isDocLoading, documents } = useContext(DataContext);
+  const { isDocLoading, documents, isCTLoading, credentialTypes } = useContext(DataContext);
+  const { profile, setProfile } = useContext(ProfileContext);
   // states
 
   const [isCheckingUnverifiedDocs, setIsCheckUnverifiedDocs] = useState(true);
   const [unVerifiedDocs, setUnverifiedDocs] = useState([]);
   const [setupProfile, setSetupProfile] = useState(false);
-  const { profile, setProfile } = useContext(ProfileContext);
   const [showTransfer, setShowTransfer] = useState(false);
   const [showReceive, setShowReceive] = useState(false);
   const [transferData, setTransferData] = useState({
@@ -51,7 +51,6 @@ const Home = () => {
   const router = useRouter();
 
   // functions
-
   function handleTransferChange(e) {
     const { name, value } = e.target;
     setTransferData({ ...transferData, [name]: value });
@@ -75,12 +74,6 @@ const Home = () => {
     }
   }
 
-  const toNumber = useCallback((number) => {
-    const toUnit = ethers.utils.formatEther(number).toString();
-    const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
-    return roundedCount;
-  }, []);
-
   function toggleTransfer() {
     setShowReceive(false);
     setShowTransfer(!showTransfer);
@@ -90,6 +83,12 @@ const Home = () => {
     setShowTransfer(false);
     setShowReceive(!showReceive);
   }
+
+  const toNumber = useCallback((number) => {
+    const toUnit = ethers.utils.formatEther(number).toString();
+    const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
+    return roundedCount;
+  }, []);
 
   const checkUnverifiedDocs = useCallback(async () => {
     const signer = new ethers.Wallet(wallet.privateKey);
@@ -116,7 +115,11 @@ const Home = () => {
     let hasRequested = true;
 
     // check did
-    if (!checkingAuth && !isDocLoading) {
+    if (!checkingAuth && !isDocLoading && !isCTLoading) {
+      const hasType = credentialTypes.find((t) => toNumber(t.id) === 0);
+
+      if (!hasType) return;
+
       if (documents.length === 0) {
         hasDid = false;
       } else {
@@ -146,7 +149,32 @@ const Home = () => {
       setSetupProfile(true);
     }
   }, [checkingAuth, isDocLoading, documents, toNumber, isCheckingUnverifiedDocs, unVerifiedDocs]);
+
   // useEffects
+  const validateAmountChanged = useCallback(() => {
+    if (transferData.amount !== 0 && !validationChecked.amount) {
+      const validAmount = transferData.amount !== 0 && transferData.amount <= parseFloat(balance);
+      setValidationChecked({ ...validationChecked, amount: true });
+      if (!validAmount) {
+        setValidationErrors({ ...validationErrors, amount: "Invalid amount" });
+        return;
+      }
+      setValidationErrors({ ...validationErrors, amount: "" });
+    }
+  }, [transferData.amount, validationChecked, setValidationChecked, validationErrors, balance, setValidationErrors]);
+
+  const validateAddressChanged = useCallback(() => {
+    if (transferData.to !== "" && !validationChecked.to) {
+      const validAddress = ethers.utils.isAddress(transferData.to);
+      setValidationChecked({ ...validationChecked, to: true });
+      if (!validAddress) {
+        setValidationErrors({ ...validationErrors, to: "Invalid address" });
+        return;
+      }
+      setValidationErrors({ ...validationErrors, to: "" });
+    }
+  }, [transferData.to, validationChecked, setValidationChecked, validationErrors, setValidationErrors]);
+
   useEffect(() => {
     if (!checkingAuth && wallet) {
       if (isCheckingUnverifiedDocs && wallet.privateKey) {
@@ -169,28 +197,12 @@ const Home = () => {
   }, [setupProfile, router]);
 
   useEffect(() => {
-    if (transferData.to !== "" && !validationChecked.to) {
-      const validAddress = ethers.utils.isAddress(transferData.to);
-      setValidationChecked({ ...validationChecked, to: true });
-      if (!validAddress) {
-        setValidationErrors({ ...validationErrors, to: "Invalid address" });
-        return;
-      }
-      setValidationErrors({ ...validationErrors, to: "" });
-    }
-  }, [transferData.to, validationChecked, setValidationChecked, validationErrors, setValidationErrors]);
+    validateAddressChanged();
+  }, [validateAddressChanged]);
 
   useEffect(() => {
-    if (transferData.amount !== 0 && !validationChecked.amount) {
-      const validAmount = transferData.amount !== 0 && transferData.amount <= parseFloat(balance);
-      setValidationChecked({ ...validationChecked, amount: true });
-      if (!validAmount) {
-        setValidationErrors({ ...validationErrors, amount: "Invalid amount" });
-        return;
-      }
-      setValidationErrors({ ...validationErrors, amount: "" });
-    }
-  }, [transferData.amount, validationChecked, setValidationChecked, validationErrors, balance, setValidationErrors]);
+    validateAmountChanged();
+  }, [validateAmountChanged]);
 
   return (
     <div className="md:grid md:grid-cols-3 gap-10 mt-10">

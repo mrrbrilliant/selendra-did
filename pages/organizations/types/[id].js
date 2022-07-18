@@ -1,12 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useState, useEffect, useContext } from "react";
-import { VscChevronDown, VscClose, VscAdd, VscTrash } from "react-icons/vsc";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { VscChevronDown, VscClose, VscAdd, VscTrash, VscInfo } from "react-icons/vsc";
 import { v4 as uid } from "uuid";
 import { DataContext } from "../../../contexts/data";
 import { useRouter } from "next/router";
 import { ethers } from "ethers";
 import { WalletContext } from "../../../contexts/wallet";
-import BtnWithAuth from "../../../hooks/useAuthCallback";
+
+import Modal from "../../../components/modal";
 
 const initialScheme = {
   $id: "https://selendra.org/schema.json",
@@ -41,7 +42,7 @@ const CreateType = () => {
     name: "",
   });
 
-  const [images, setImages] = useState([]);
+  // const [images, setImages] = useState([]);
   const [isUploadingImages, setIsUploadingImages] = useState(false);
 
   const [schema, setSchema] = useState(initialScheme);
@@ -58,7 +59,14 @@ const CreateType = () => {
     lifespan: 0,
   });
 
+  const [createCtypeModalOpen, setCreateCtypeModalOpen] = useState(false);
+  const [valid, setValid] = useState(false);
+
   const { id } = router.query;
+
+  function toggleCreateOpenModal() {
+    setCreateCtypeModalOpen(!createCtypeModalOpen);
+  }
 
   function toNumber(number) {
     const toUnit = ethers.utils.formatEther(number).toString();
@@ -132,6 +140,7 @@ const CreateType = () => {
   }
 
   function handleSelectFiles(e) {
+    e.preventDefault();
     const files = e.target.files;
     let _files = [];
 
@@ -139,19 +148,18 @@ const CreateType = () => {
       _files.push(files[i]);
     }
 
-    setImages(_files);
+    // setImages(_files);
+    handleUploadImages(_files);
   }
 
-  function handleUploadImages(e) {
-    if (e) e.preventDefault();
-
-    if (images.length === 0) return;
+  function handleUploadImages(_images) {
+    if (_images.length === 0) return;
 
     setIsUploadingImages(true);
 
     let formData = new FormData();
-    for (let i = 0; i < images.length; i++) {
-      formData.append(i.toString(), images[i], images[i].name);
+    for (let i = 0; i < _images.length; i++) {
+      formData.append(i.toString(), _images[i], _images[i].name);
     }
 
     var requestOptions = {
@@ -171,7 +179,7 @@ const CreateType = () => {
             urls.push(`https://gateway.kumandra.org/files/${_d.Hash}`);
           }
         }
-        return urls;
+        setSchema({ ...schema, images: urls });
       })
       .catch((error) => null);
   }
@@ -218,16 +226,104 @@ const CreateType = () => {
 
   const handleCreateCtype = async () => {
     const _schema = await prepareSchema();
-    const urls = await handleUploadImages();
+    // const urls = await handleUploadImages();
     // @ts-ignore
-    _schema["images"] = urls;
-    setSchema(_schema);
+    // _schema["images"] = urls;
+    setSchema({ ...schema, ..._schema });
     setTimeout(() => {}, 1000);
     const uploading = await upload(schema);
     if (uploading) {
       router.push(`/organizations/${id}`);
     }
   };
+
+  function isPermanentID() {
+    const { transferable, expirable, revokable } = createCtypeForm;
+    return !transferable && !expirable && !revokable;
+  }
+
+  function isExpirableID() {
+    const { transferable, expirable, revokable } = createCtypeForm;
+    return !transferable && !revokable && expirable;
+  }
+
+  function isRevokableID() {
+    const { transferable, expirable, revokable } = createCtypeForm;
+    return !transferable && !expirable && revokable;
+  }
+
+  function isRevokableAndExpirableID() {
+    const { transferable, expirable, revokable } = createCtypeForm;
+    return !transferable && expirable && revokable;
+  }
+
+  function isAsset() {
+    const { transferable, expirable, revokable } = createCtypeForm;
+    return transferable && !expirable && !revokable;
+  }
+
+  function checkPermanentID() {
+    setCreateCtypeForm({
+      ...createCtypeForm,
+      lifespan: 0,
+      transferable: false,
+      expirable: false,
+      revokable: false,
+    });
+  }
+
+  function checkRevokable() {
+    setCreateCtypeForm({
+      ...createCtypeForm,
+      lifespan: 0,
+      transferable: false,
+      expirable: false,
+      revokable: true,
+    });
+  }
+
+  function checkExpirableID() {
+    setCreateCtypeForm({
+      ...createCtypeForm,
+      lifespan: 0,
+      transferable: false,
+      revokable: false,
+      expirable: true,
+    });
+  }
+
+  function checkRevokableAndExpirableID() {
+    setCreateCtypeForm({
+      ...createCtypeForm,
+      lifespan: 0,
+      transferable: false,
+      revokable: true,
+      expirable: true,
+    });
+  }
+
+  function checkAsset() {
+    setCreateCtypeForm({
+      ...createCtypeForm,
+      lifespan: 0,
+      transferable: true,
+      expirable: false,
+      revokable: false,
+    });
+  }
+
+  const validateCreate = useCallback(() => {
+    const _valid_schema = schema.description !== "" && schema.ownerId !== "" && schema.images.length > 0;
+    const _props = propsArray.map((a) => a.name !== "" && a.type !== "" && a.descriptions !== "");
+    const _valid_props = _props.includes(false);
+    const _valid = _valid_schema && !_valid_props;
+    console.log(_valid);
+    setValid(_valid);
+  }, [schema, propsArray, setValid]);
+
+  useEffect(() => {
+    validateCreate();
+  }, [validateCreate]);
 
   useEffect(() => {
     const o = arrayToObject();
@@ -265,165 +361,377 @@ const CreateType = () => {
     }
   }, [wallet, toggleRequest, show]);
 
-  useEffect(() => {
-    console.log(propsObject);
-  }, [propsObject]);
+  // useEffect(() => {
+  //   console.log(propsObject);
+  // }, [propsObject]);
+
+  // useEffect(() => {
+  //   console.log(schema);
+  // }, [schema]);
 
   return (
-    <>
-      <div className="mb-4">
-        <h1 className="font-bold">Create Documents Template</h1>
-
-        <br />
-        <div className="bg-base-100 px-8 py-8 rounded-lg">
-          <form>
-            <div>
-              <label className="font-semibold text-accent">Title</label>
-              <input
-                name="title"
-                value={schema.title}
-                onChange={handleChange}
-                className="bg-gray-200 w-full p-2 rounded text-black"
-                placeholder="Title"
-              />
-            </div>
-            <br />
-            <div>
-              <label className="font-semibold text-accent">Description</label>
-              <input
-                name="description"
-                value={schema.description}
-                onChange={handleChange}
-                className="bg-gray-200 w-full p-2 rounded text-black"
-                placeholder="Description"
-              />
-            </div>
-            <br />
-            <div>
-              <label className="font-semibold text-accent">OwnerId</label>
-              <input
-                name="ownerId"
-                value={schema.ownerId}
-                onChange={handleChange}
-                className="bg-gray-200 w-full p-2 rounded text-black"
-                placeholder="OwnerId"
-              />
-            </div>
-            <br />
-            <div>
-              <label className="cursor-pointer label">
-                <span className="label-text text-base">Expirable</span>
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-accent"
-                  name="expirable"
-                  checked={createCtypeForm.expirable}
-                  onChange={handleCtypeFormChange}
-                />
-              </label>
-              {createCtypeForm.expirable && (
-                <input
-                  type="number"
-                  placeholder="Number of days to expire"
-                  className="input input-bordered w-full"
-                  name="lifespan"
-                  value={createCtypeForm.lifespan}
-                  onChange={handleCtypeFormChange}
-                />
-              )}
-            </div>
-
-            <div>
-              <label className="cursor-pointer label">
-                <span className="label-text text-base">Transferable</span>
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-accent"
-                  name="transferable"
-                  checked={createCtypeForm.transferable}
-                  onChange={handleCtypeFormChange}
-                />
-              </label>
-              <label className="cursor-pointer label">
-                <span className="label-text text-base">Revokable</span>
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-accent"
-                  name="revokable"
-                  checked={createCtypeForm.revokable}
-                  onChange={handleCtypeFormChange}
-                />
-              </label>
-            </div>
-            <br />
-            <div className="flex justify-between p-1 rounded-xl">
-              <h3>Images</h3>
-              <div className="flex space-x-4">
-                <label className="btn rounded-xl modal-button ml-2" htmlFor="formFile">
-                  Add images
-                  <input
-                    type="file"
-                    id="formFile"
-                    placeholder="No files chosen"
-                    className="input input-bordered hidden"
-                    multiple={true}
-                    onChange={handleSelectFiles}
-                  />
+    <div className="">
+      <Modal open={createCtypeModalOpen} toggle={toggleCreateOpenModal}>
+        <h3 className="font-bold text-lg">Caution!</h3>
+        <p className="py-4">Are you sure? Please double check!</p>
+        <div className="modal-action">
+          <button className="btn btn-success flex-grow" onClick={handleCreateCtype}>
+            Create
+          </button>
+          <button className="btn btn-info flex-grow" onClick={toggleCreateOpenModal}>
+            Cancel
+          </button>
+        </div>
+      </Modal>
+      <div className="bg-base-100 p-6 rounded-lg">
+        <form>
+          <div>
+            <h1 className="font-bold text-2xl mb-6">Documents Template</h1>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="flex flex-col space-y-4">
+              <div>
+                <label className="label">
+                  <span className="label-text">Title</span>
                 </label>
-                {images && images.length > 0 && (
-                  <button className="btn btn-primary rounded-xl" onClick={handleUploadImages}>
-                    Upload
-                  </button>
-                )}
-                {images && images.length > 0 && (
-                  <button className="btn btn-error rounded-xl" onClick={() => setImages([])}>
+                <input
+                  name="title"
+                  value={schema.title}
+                  onChange={handleChange}
+                  className="w-full p-2 input input-bordered"
+                />
+              </div>
+              <div>
+                <label className="label">
+                  <span className="label-text">OwnerId</span>
+                </label>
+                <input
+                  name="ownerId"
+                  value={schema.ownerId}
+                  onChange={handleChange}
+                  className="w-full p-2 input input-bordered font-mono"
+                  placeholder="OwnerId"
+                />
+              </div>
+              <div>
+                <label className="label">
+                  <span className="label-text">Description</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={schema.description}
+                  onChange={handleChange}
+                  className="w-full p-2 textarea textarea-bordered"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 ">
+              <div className="flex">
+                <h3 className="flex-grow">Logo</h3>
+                {schema.images && schema.images.length > 0 && (
+                  <button
+                    className="btn btn-xs btn-error rounded-xl"
+                    onClick={() => setSchema({ ...schema, images: [] })}
+                  >
                     Clear
                   </button>
                 )}
               </div>
-            </div>
-            <br />
-            {images && images.length > 0 && (
-              <div className="carousel carousel-center h-64 p-4 space-x-4 rounded-box bg-base-300 justify-start">
-                {images.map((img, index) => {
-                  return (
-                    <div key={index} className="carousel-item">
-                      <img src={URL.createObjectURL(img)} alt="" className="rounded-box w-full" />
-                    </div>
-                  );
-                })}
+              <div className="w-fulll h-full flex-grow space-x-4 bg-base-200 rounded-lg">
+                {!schema.images ||
+                  (schema.images.length === 0 && (
+                    <label
+                      className="btn btn-ghost h-full rounded-xl modal-button flex place-content-center place-items-center"
+                      htmlFor="formFile"
+                    >
+                      Add Logo
+                    </label>
+                  ))}
+                <input
+                  type="file"
+                  id="formFile"
+                  placeholder="No files chosen"
+                  className="input input-bordered hidden"
+                  multiple={false}
+                  onChange={handleSelectFiles}
+                />
+
+                {schema.images && schema.images.length > 0 && (
+                  <div className="carousel carousel-center h-64 p-4 space-x-4 rounded-box justify-center">
+                    {schema.images.map((img, index) => {
+                      return (
+                        <div key={index} className="carousel-item">
+                          <img src={img} alt="" className="rounded-box w-full" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            )}
-
-            <br />
-            <div>
-              <h1 className="font-bold">Properties</h1>
             </div>
+          </div>
 
-            {propsArray.map((pro) => (
-              <NewProperty
-                key={pro.id}
-                data={pro}
-                removeProp={removeProp}
-                handlePropsChange={handlePropsChange}
-                handleAddOption={handleAddOption}
-                handleRemoveOption={handleRemoveOption}
+          <div>
+            <h1 className="font-bold text-2xl my-6">Category</h1>
+          </div>
+
+          <div className="w-full h-16 grid grid-cols-5 gap-6 mt-6">
+            <label
+              htmlFor="radio-1"
+              className="h-full input input-bordered rounded-xl overflow-hidden flex place-items-center p-6 cursor-pointer relative"
+            >
+              <input
+                type="radio"
+                id="radio-1"
+                name="radio-4"
+                className="checkbox checkbox-accent peer z-10"
+                checked={isPermanentID()}
+                onChange={checkPermanentID}
               />
-            ))}
-          </form>
-          <button className="w-full btn btn-ghost font-bold rounded-lg no-animation h-12 my-4" onClick={addProp}>
-            Add property
-          </button>
-        </div>
+              <span className="ml-6 flex-grow z-10 peer-checked:font-bold">Permanent ID</span>
 
-        <button
-          onClick={handleCreateCtype}
-          className="btn btn-block bg-accent text-white font-bold rounded-b-lg no-animation h-12"
-        >
+              <div className="w-full h-full left-0 top-0 absolute peer-checked:bg-accent opacity-20 z-0"></div>
+            </label>
+            <label
+              htmlFor="radio-2"
+              className="h-full input input-bordered rounded-xl overflow-hidden flex place-items-center p-6 cursor-pointer relative"
+            >
+              <input
+                type="radio"
+                id="radio-2"
+                name="radio-4"
+                className="checkbox checkbox-accent peer z-10"
+                checked={isRevokableID()}
+                onChange={checkRevokable}
+              />
+              <span className="ml-6 flex-grow z-10 peer-checked:font-bold">Revokable ID</span>
+
+              <div className="w-full h-full left-0 top-0 absolute peer-checked:bg-accent opacity-20 z-0"></div>
+            </label>
+
+            <label
+              htmlFor="radio-3"
+              className="h-full input input-bordered rounded-xl overflow-hidden flex place-items-center p-6 cursor-pointer relative"
+            >
+              <input
+                type="radio"
+                id="radio-3"
+                name="radio-4"
+                className="checkbox checkbox-accent peer z-10"
+                checked={isExpirableID()}
+                onChange={checkExpirableID}
+              />
+              <span className="ml-6 flex-grow z-10 peer-checked:font-bold">Expirable ID</span>
+              <div className="w-full h-full left-0 top-0 absolute peer-checked:bg-accent opacity-20 z-0"></div>
+            </label>
+
+            <label
+              htmlFor="radio-4"
+              className="h-full input input-bordered rounded-xl overflow-hidden flex place-items-center p-6 cursor-pointer relative"
+            >
+              <input
+                type="radio"
+                id="radio-4"
+                name="radio-4"
+                className="checkbox checkbox-accent peer z-10"
+                checked={isRevokableAndExpirableID()}
+                onChange={checkRevokableAndExpirableID}
+              />
+              <span className="ml-6 flex-grow z-10 peer-checked:font-bold">Revokable and Expirable ID</span>
+
+              <div className="w-full h-full left-0 top-0 absolute peer-checked:bg-accent opacity-20 z-0"></div>
+            </label>
+
+            <label
+              htmlFor="radio-5"
+              className="h-full input input-bordered rounded-xl overflow-hidden flex place-items-center p-6 cursor-pointer relative"
+            >
+              <input
+                type="radio"
+                id="radio-5"
+                name="radio-4"
+                className="checkbox checkbox-accent peer z-10"
+                checked={isAsset()}
+                onChange={checkAsset}
+              />
+              <span className="ml-6 flex-grow z-10 peer-checked:font-bold">Digtal Asset (NFT)</span>
+              <div className="w-full h-full left-0 top-0 absolute peer-checked:bg-accent opacity-20 z-0"></div>
+            </label>
+          </div>
+
+          <br />
+          {isPermanentID() && (
+            <div className="alert alert-warning bg-opacity-50">
+              <div>
+                <VscInfo size={32} />
+                <div>
+                  <h3 className="font-bold">Permanent ID</h3>
+                  <div className="text-sm">
+                    <p>
+                      Documents minted on this type will never expire. The owner owns the identity wholely, however, the
+                      owner cannot transfer it to other party. The attestation issuer, organization, cannot invalidate,
+                      unverify or revoke the documents.
+                    </p>
+                    <br />
+                    <ul className="flex space-x-2">
+                      <li className="font-bold">Examples: </li>
+                      <li>National ID card,</li>
+                      <li>Educational certificates</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isRevokableID() && (
+            <div className="alert alert-warning bg-opacity-50">
+              <div>
+                <VscInfo size={32} />
+                <div>
+                  <h3 className="font-bold">Revokable ID</h3>
+                  <div className="text-sm">
+                    <p>
+                      Documents minted on this type will never expire. The owner does not own the identity wholely, and
+                      the owner cannot transfer it to other party. The attestation issuer, organization, can invalidate,
+                      unverify or revoke the documents.
+                    </p>
+
+                    <br />
+                    <ul className="flex space-x-2">
+                      <li className="font-bold">Examples: </li>
+                      <li>Employment contracts</li>
+                      <li>Business licences</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isExpirableID() && (
+            <div className="alert alert-warning bg-opacity-50">
+              <div>
+                <VscInfo size={32} />
+                <div>
+                  <h3 className="font-bold">Expirable ID</h3>
+                  <div className="text-sm">
+                    <p>
+                      Documents minted on this type will expire after a specific duration limited by the organization.
+                      The owner owns the identity wholely, but the owner cannot transfer it to other party. The
+                      attestation issuer, organization, cannot invalidate, unverify or revoke the documents.
+                    </p>
+
+                    <br />
+                    <ul className="flex space-x-2">
+                      <li className="font-bold">Examples: </li>
+                      <li>Cinema tickets</li>
+                      <li>Membership subscription</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isRevokableAndExpirableID() && (
+            <div className="alert alert-warning bg-opacity-50">
+              <div>
+                <VscInfo size={32} />
+                <div>
+                  <h3 className="font-bold">Revokable and Expirable ID</h3>
+                  <div className="text-sm">
+                    <p>
+                      Documents minted on this type will expire after a specific duration limited by the organization.
+                      The owner does not own the identity wholely, and the owner cannot transfer it to other party. The
+                      attestation issuer, organization, can invalidate, unverify or revoke the documents.
+                    </p>
+
+                    <br />
+                    <ul className="flex space-x-2">
+                      <li className="font-bold">Examples: </li>
+                      <li>Driving licence</li>
+                      <li>Scolarship</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isAsset() && (
+            <div className="alert alert-warning bg-opacity-50">
+              <div>
+                <VscInfo size={32} />
+                <div>
+                  <h3 className="font-bold">Digtal Asset (NFT)</h3>
+                  <div className="text-sm">
+                    <p>
+                      The owner owns the asset wholely and the owner can transfer the ownership to other party. It will
+                      never be expired. It cannot be invalidated, unverified or revoked by the attestation issuer,
+                      organization.
+                    </p>
+
+                    <br />
+                    <ul className="flex space-x-2">
+                      <li className="font-bold">Examples: </li>
+                      <li>Digital tokens</li>
+                      <li>Land title</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {createCtypeForm.expirable && (
+            <div>
+              <label className="label">
+                <span className="label-text">How many days will this document expired after creating date?</span>
+              </label>
+              <input
+                name="lifespan"
+                type="number"
+                step={1}
+                min={1}
+                value={createCtypeForm.lifespan}
+                onChange={handleCtypeFormChange}
+                className="w-full p-2 input input-bordered"
+              />
+              <label className="label">
+                <span className="label-text text-error">
+                  Confirmatation! This document will expire in {createCtypeForm.lifespan} days after created!
+                </span>
+              </label>
+            </div>
+          )}
+          <br />
+
+          <div>
+            <h1 className="font-bold text-2xl my-6">Properties</h1>
+          </div>
+
+          {propsArray.map((pro) => (
+            <NewProperty
+              key={pro.id}
+              data={pro}
+              removeProp={removeProp}
+              handlePropsChange={handlePropsChange}
+              handleAddOption={handleAddOption}
+              handleRemoveOption={handleRemoveOption}
+            />
+          ))}
+        </form>
+        <button className="w-full btn btn-outline font-bold rounded-lg no-animation h-12 my-6" onClick={addProp}>
+          Add property
+        </button>
+
+        <button onClick={toggleCreateOpenModal} className="btn btn-block border-none" disabled={!valid}>
           SUBMIT
         </button>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -445,7 +753,7 @@ const NewProperty = ({ data, removeProp, handlePropsChange, handleAddOption, han
   const dataTypes = [
     { label: "Text", value: "string", default: true },
     { label: "Number", value: "number", default: false },
-    { label: "Boolean", value: "boolean", default: false },
+    { label: "True/False", value: "boolean", default: false },
     { label: "List", value: "array", default: false },
     { label: "Object", value: "object", default: false },
     { label: "Images", value: "array", default: false },
@@ -453,30 +761,33 @@ const NewProperty = ({ data, removeProp, handlePropsChange, handleAddOption, han
   const [selected, setSelected] = useState(dataTypes[0].value);
 
   return (
-    <div>
+    <div className="h-max">
       <div className="grid grid-cols-3 gap-7 mt-3">
         <div>
-          <label className="font-semibold text-accent">Name</label>
+          <label className="label">
+            <span className="label-text">Field name</span>
+          </label>
 
           <input
             name="name"
             value={data.name}
             onChange={(e) => handlePropsChange(e, data.id)}
-            className="bg-gray-200 w-full p-2 rounded text-black"
-            placeholder="Name"
+            className="w-full input input-bordered"
+            // placeholder="Name"
           />
         </div>
         <div>
-          <label className="font-semibold text-accent">Type</label>
-          <div className="relative inline-block w-full text-gray-700">
+          <label className="label">
+            <span className="label-text">Content type</span>
+          </label>
+          <div className="relative inline-block w-full">
             <select
               name="type"
-              className="w-full h-10 pl-3 pr-6 text-base placeholder-gray-600 border rounded-lg appearance-none focus:shadow-outline"
-              // value={JSON.stringify(data)}
+              className="w-full input input-bordered"
               defaultValue={data.type}
               onChange={(e) => handlePropsChange(e, data.id)}
             >
-              <option>Choose a type</option>
+              <option disabled>Choose a type</option>
               {dataTypes.map((option) => (
                 <option key={option.label} value={JSON.stringify(option)}>
                   {option.label}
@@ -495,20 +806,23 @@ const NewProperty = ({ data, removeProp, handlePropsChange, handleAddOption, han
             </div>
           </div>
         </div>
-        <div className="flex">
-          <div>
-            <label className="font-semibold text-accent">Description</label>
+        <div className="flex place-content-center">
+          <div className="w-full">
+            <label className="label">
+              <span className="label-text">Description</span>
+            </label>
+
             <textarea
               name="descriptions"
+              rows={1}
               value={data.descriptions}
               onChange={(e) => handlePropsChange(e, data.id)}
-              className="bg-gray-200 w-full p-2 h-10 rounded text-black"
-              placeholder="Description"
+              className="w-full textarea textarea-bordered"
             />
           </div>
-          <div className=" pt-8 pl-10">
-            <button className="btn btn-xs btn-error btn-square" onClick={() => removeProp(data.id)}>
-              <VscClose />
+          <div className="px-2">
+            <button className="btn btn-xs btn-error btn-circle mt-12" onClick={() => removeProp(data.id)}>
+              <VscClose size={22} />
             </button>
           </div>
         </div>
