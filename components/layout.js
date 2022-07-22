@@ -33,8 +33,8 @@ const Layout = ({ children }) => {
   return (
     <div className="h-auto min-h-screen relative">
       <Navbar toggleQr={toggleQr} />
+      <div className="md:px-6 lg:px-[10vw] xl:px-[15vw] py-6 z-0">{children}</div>
       {openQr && <Scanner toggleQr={toggleQr} />}
-      <div className="md:px-6 lg:px-[10vw] xl:px-[15vw] py-6">{children}</div>
     </div>
   );
 };

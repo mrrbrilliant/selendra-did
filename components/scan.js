@@ -83,7 +83,7 @@ export default function Scanner({ toggleQr }) {
 
   return (
     <div
-      className="w-full h-full flex place-content-center place-items-center fixed top-0 left-0 backdrop-blur-md"
+      className="w-full h-full flex place-content-center place-items-center fixed top-0 left-0 backdrop-blur-md z-auto"
       onClick={toggleQr}
     >
       <div
