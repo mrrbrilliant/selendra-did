@@ -123,7 +123,7 @@ const Organizations = () => {
   }, [extension, setCreateOrgForm]);
 
   return (
-    <>
+    <div>
       {/* =================>create orgaization Modal<================== */}
       <Modal open={createModalOpen} toggle={toggleCreateOpenModal}>
         <form className="form-control w-full" onSubmit={handleCreateOrg}>
@@ -188,18 +188,17 @@ const Organizations = () => {
         </form>
       </Modal>
 
-      <div className="flex justify-end -mt-9 rounded-xl space-x-4">
-        <BtnWithAuth callback={toggleCreateOpenModal} className="">
-          <label className="btn btn-primary rounded-xl modal-button">Create Organizations</label>
-        </BtnWithAuth>
-      </div>
-
       {/* ===================owner Organization======================= */}
-      <div className="mb-8">
-        <div>
-          <h3 className="font-bold">My Organizations</h3>
+      <div className="flex flex-col gap-6">
+        <div className="flex place-content-center place-items-center">
+          <h3 className="font-bold flex-grow">My Organizations</h3>
+          <div className="flex justify-end  rounded-xl space-x-4">
+            <BtnWithAuth callback={toggleCreateOpenModal} className="">
+              <label className="btn btn-primary rounded-xl modal-button">Create Organizations</label>
+            </BtnWithAuth>
+          </div>
         </div>
-        <div className="grid grid-cols-4 gap-7 mt-4">
+        <div className="grid grid-cols-4 gap-7">
           {ownOrganizations &&
             ownOrganizations.map((org, index) => {
               return (
@@ -253,7 +252,7 @@ const Organizations = () => {
 
       {/* =========================>other orgaization======================= */}
 
-      <div>
+      <div className="py-6">
         <h3 className="font-bold">Other Organizations</h3>
       </div>
       <div className="grid grid-cols-4 gap-7 mt-4">
@@ -306,7 +305,7 @@ const Organizations = () => {
             );
           })}
       </div>
-    </>
+    </div>
   );
 };
 

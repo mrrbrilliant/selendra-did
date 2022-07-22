@@ -205,154 +205,139 @@ const Home = () => {
   }, [validateAmountChanged]);
 
   return (
-    <div className="md:grid md:grid-cols-3 gap-10 mt-10">
-      <div className="md:col-span-1">
-        <div className="bg-base-100 p-6 rounded-xl flex flex-col gap-4">
-          <div className="avatar">
-            <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-              <img
-                src={
-                  profile
-                    ? profile?.avatar
-                    : "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/412.jpg"
-                }
-                alt=""
-              />
-            </div>
+    <div className="flex flex-col gap-6">
+      <div className="w-full stats bg-base-100">
+        <div className="stat">
+          <div className="stat-title">Current balance</div>
+          <div className="stat-value">
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "SEL",
+              maximumFractionDigits: 5,
+            }).format(balance)}
+            {!privateKey && (
+              <span>
+                <VscLock fontSize={32} />
+              </span>
+            )}
           </div>
-
-          <div>
-            <p className="font-bold text-xl mb-2">{profile && profile?.full_name}</p>
-            <textarea
-              className="w-full mb-2 text-sm resize-none font-mono bg-transparent"
-              rows={1}
-              value={publicKey || ""}
-              readOnly
-            />
+          <div className="stat-actions flex gap-6">
+            <button className="btn btn-sm btn-success flex-grow">Add SEL</button>
+            <button className="btn btn-sm btn-primary flex-grow" onClick={toggleTransfer}>
+              Transfer
+            </button>
+            <button className="btn btn-sm btn-secondary flex-grow" onClick={toggleReceive}>
+              Receive
+            </button>
           </div>
         </div>
 
-        <div className="stats bg-base-100 w-full mt-4">
-          <div className="stat ">
-            <div className="stat-title">Current balance</div>
-            <div className="stat-value flex place-items-center font-mono">
-              {parseFloat(balance).toLocaleString("en-US", {
-                style: "currency",
-                currency: "SEL",
-                maximumFractionDigits: 6,
-              })}
-              {!privateKey && (
-                <span>
-                  <VscLock fontSize={32} />
-                </span>
-              )}
-            </div>
-            <div className="stat-actions flex gap-4">
-              <button className="btn btn-sm btn-success">Add SEL</button>
-              <button className="btn btn-sm btn-primary" onClick={toggleTransfer}>
-                Transfer
-              </button>
-              <button className="btn btn-sm btn-secondary" onClick={toggleReceive}>
-                Receive
-              </button>
-            </div>
-            {showTransfer && (
-              <form className="flex flex-col gap-4 mt-4" onSubmit={handleTransfer}>
-                <div className="flex flex-col">
-                  <label className="label">
-                    <span className="label-text">Receiver address</span>
-                    <span className="label-text-alt">0x</span>
-                  </label>
-
-                  <input
-                    type="text"
-                    name="to"
-                    className="input input-bordered font-mono"
-                    placeholder="0x0000000000000000000000000000000000000000"
-                    value={transferData.to}
-                    onChange={handleTransferChange}
-                  />
-
-                  {validationErrors.to !== "" && (
-                    <label className="label">
-                      <span className="label-text text-error">{validationErrors.to}</span>
-                    </label>
-                  )}
-                </div>
-                <div className="flex flex-col">
-                  <label className="label">
-                    <span className="label-text">Amount to be transfered</span>
-                    <span className="label-text-alt">SEL</span>
-                  </label>
-                  <input
-                    type="number"
-                    step={0.000001}
-                    min={0.000001}
-                    name="amount"
-                    className="input input-bordered"
-                    value={transferData.amount}
-                    onChange={handleTransferChange}
-                  />
-                  {validationErrors.amount !== "" && (
-                    <label className="label">
-                      <span className="label-text text-error">{validationErrors.amount}</span>
-                    </label>
-                  )}
-                </div>
-                <input
-                  type="submit"
-                  name="submit"
-                  value="SEND"
-                  className="btn btn-primary"
-                  disabled={validationErrors.to !== "" || validationErrors.amount !== ""}
-                />
-              </form>
-            )}
-
-            {showReceive && (
-              <div className="flex flex-col gap-4 mt-4 place-content-center place-items-center">
-                <QRCode value={publicKey} eyeRadius={5} />
-                <textarea
-                  className="w-full mb-2 text-sm resize-none font-mono bg-transparent text-center"
-                  rows={1}
-                  value={publicKey || ""}
-                  readOnly
+        <div className="stat place-content-center-center">
+          <div className="stat-figure text-secondary">
+            <div className="avatar online">
+              <div className="w-24 rounded-full  ring ring-primary ring-offset-base-100 ring-offset-2">
+                <img
+                  src={
+                    profile
+                      ? profile?.avatar
+                      : "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/412.jpg"
+                  }
+                  alt=""
                 />
               </div>
-            )}
+            </div>
           </div>
+          <div className="stat-title"></div>
+          <div className="stat-value">{profile && profile?.full_name}</div>
+          <div className="stat-title font-mono">{publicKey || ""}</div>
         </div>
       </div>
-      <div className="md:col-span-2">
-        <div>
-          <div className="mb-8">
-            <div>
-              <h3 className="font-bold">My Documents</h3>
-            </div>
-            <div>
-              <div className="grid grid-cols-3 mt-6 gap-6 ">
-                {documents &&
-                  documents.length > 0 &&
-                  documents
-                    .filter((res) => toNumber(res.ctypeId) != 0)
-                    .map((res, index) => {
-                      return <DocumentCard key={index} res={res} />;
-                    })}
-              </div>
-              {unVerifiedDocs.length > 0 && (
-                <>
-                  <h1>Unverified</h1>
-                  <div className="grid grid-cols-3 mt-6 gap-6 ">
-                    {unVerifiedDocs &&
-                      unVerifiedDocs.length > 0 &&
-                      unVerifiedDocs.map((res, index) => {
-                        return <DocumentCard key={index} res={res} />;
-                      })}
-                  </div>
-                </>
-              )}
-            </div>
+
+      {showTransfer && (
+        <form className="flex flex-col gap-6 bg-base-100 p-6 rounded-xl" onSubmit={handleTransfer}>
+          <div className="flex flex-col">
+            <label className="label">
+              <span className="label-text">Receiver address</span>
+              <span className="label-text-alt">0x</span>
+            </label>
+
+            <input
+              type="text"
+              name="to"
+              className="input input-bordered font-mono"
+              placeholder="0x0000000000000000000000000000000000000000"
+              value={transferData.to}
+              onChange={handleTransferChange}
+            />
+
+            {validationErrors.to !== "" && (
+              <label className="label">
+                <span className="label-text text-error">{validationErrors.to}</span>
+              </label>
+            )}
           </div>
+          <div className="flex flex-col">
+            <label className="label">
+              <span className="label-text">Amount to be transfered</span>
+              <span className="label-text-alt">SEL</span>
+            </label>
+            <input
+              type="number"
+              step={0.000001}
+              min={0.000001}
+              name="amount"
+              className="input input-bordered"
+              value={transferData.amount}
+              onChange={handleTransferChange}
+            />
+            {validationErrors.amount !== "" && (
+              <label className="label">
+                <span className="label-text text-error">{validationErrors.amount}</span>
+              </label>
+            )}
+          </div>
+          <input
+            type="submit"
+            name="submit"
+            value="SEND"
+            className="btn btn-primary"
+            disabled={validationErrors.to !== "" || validationErrors.amount !== ""}
+          />
+        </form>
+      )}
+
+      {showReceive && (
+        <div className="bg-base-100 rounded-xl p-6 flex flex-col gap-6 place-content-center place-items-center">
+          <QRCode value={publicKey} eyeRadius={5} size={250} />
+        </div>
+      )}
+
+      <div className="mb-8">
+        <div>
+          <h3 className="font-bold text-xl">My Documents</h3>
+        </div>
+        <div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6 gap-6 ">
+            {documents &&
+              documents.length > 0 &&
+              documents
+                .filter((res) => toNumber(res.ctypeId) != 0)
+                .map((res, index) => {
+                  return <DocumentCard key={index} res={res} />;
+                })}
+          </div>
+          {unVerifiedDocs.length > 0 && (
+            <>
+              <h1>Unverified</h1>
+              <div className="grid grid-cols-4 mt-6 gap-6 ">
+                {unVerifiedDocs &&
+                  unVerifiedDocs.length > 0 &&
+                  unVerifiedDocs.map((res, index) => {
+                    return <DocumentCard key={index} res={res} />;
+                  })}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -431,21 +416,21 @@ const DocumentCard = ({ res }) => {
   }, [typeDetail, docDetail, findImage, images]);
 
   return (
-    <div className=" rounded-2xl p-4 border-gray-100 bg-base-100 relative overflow-hidden">
-      <div className="flex flex-col place-items-start place-content-start">
+    <div className="rounded-2xl p-4 border-gray-100 bg-base-100 relative overflow-hidden">
+      <div className="h-full flex flex-col place-content-between">
         {images.length > 0 && (
-          <div className="w-full  h-max flex place-content-center place-items-center mb-4 rounded-xl overflow-hidden relative">
-            <img className="w-full max-h-64" src={images[0]} alt="" layout="fixed" width={100} height={100} />
+          <div className="w-full h-max flex-grow flex place-content-center place-items-center mb-4 rounded-xl overflow-hidden relative">
+            <img className="w-full h-auto " src={images[0]} alt="" layout="fixed" width={100} height={100} />
           </div>
         )}
 
         {images.length === 0 && typeDetail && typeDetail.images && (
-          <div className="w-full  h-max flex place-content-center place-items-center mb-4">
-            <img className="w-auto max-h-64" src={typeDetail.images[0]} alt="" />
+          <div className="w-full flex-grow h-max flex place-content-center place-items-center mb-4 rounded-xl overflow-hidden">
+            <img className="w-full h-auto" src={typeDetail.images[0]} alt="" />
           </div>
         )}
-        {toNumber(res.ctypeId)}
-        <div className="w-full flex flex-col flex-grow space-y-4">
+        {/* {toNumber(res.ctypeId)} */}
+        <div className="w-full flex flex-col space-y-4">
           <div>
             <Badge status={res.status} />
             <h4 className="text-xl font-semibold uppercase">{res.name}</h4>
@@ -512,7 +497,7 @@ const DocumentCard = ({ res }) => {
 
               {cType && cType.transferable && (
                 <BtnWithAuth
-                  className="p-2 flex-grow text-white w-32 leading-none rounded font-bold mt-2 bg-primarypink hover:bg-opacity-75 text-xs uppercase"
+                  className="p-2 btn btn-primary flex-grow text-white w-32 leading-none rounded-xl font-bold mt-2 bg-primarypink hover:bg-opacity-75 text-xs uppercase"
                   callback={() => {
                     setOpenTransfer(true);
                   }}

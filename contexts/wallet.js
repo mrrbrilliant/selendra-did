@@ -16,6 +16,7 @@ export default function WalletProvider({ children }) {
   const [show, setShow] = useState(false);
   const [cb, setCb] = useState();
   const router = useRouter();
+  const path = router.pathname;
 
   function createWallet({ password, mnemonic }) {
     const _wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
@@ -88,19 +89,14 @@ export default function WalletProvider({ children }) {
   }, [checkingAuth, setEncryptedWallet, setPublicKey, setCheckingAuth]);
 
   useEffect(() => {
-    if (!checkingAuth) {
-      if (!publicKey && !encryptedWallet) {
-        if (router.pathname !== "/createWallet") {
-          router.replace("/createWallet");
+    if (path !== "/profile") {
+      if (!checkingAuth) {
+        if (!publicKey && !encryptedWallet) {
+          if (router.pathname !== "/createWallet") {
+            router.replace("/createWallet");
+          }
+          return;
         }
-        return;
-      }
-
-      if (!publicKey && encryptedWallet) {
-        if (router.pathname !== "/unlock") {
-          router.replace("/unlock");
-        }
-        return;
       }
     }
   }, [checkingAuth, publicKey, encryptedWallet, router]);

@@ -194,6 +194,9 @@ export default function Docs() {
         const toCreateData = { ...document, propertyURI, propertyHash };
 
         createDocument({ ...toCreateData });
+        if (document.ctypeId == 0) {
+          window.location.replace("/");
+        }
         router.back();
       }
     } catch (error) {
@@ -222,7 +225,12 @@ export default function Docs() {
 
     return fetch("https://attestation.koompi.org/claims/create", requestOptions)
       .then((response) => response.text())
-      .then((result) => result)
+      .then((result) => {
+        if (document.ctypeId == 0) {
+          window.location.replace("/");
+        }
+        router.back();
+      })
       .catch((error) => error);
   };
 

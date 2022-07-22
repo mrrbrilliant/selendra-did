@@ -81,11 +81,11 @@ export default function DataProvider({ children }) {
     await fetchOwnOrgzations();
   };
 
-  const toNumber = useCallback((number) => {
+  const toNumber = (number) => {
     const toUnit = ethers.utils.formatEther(number).toString();
     const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
     return roundedCount;
-  }, []);
+  };
 
   async function countOrgByUser() {
     const count = await contractRO.organizationOf(publicKey);
@@ -97,7 +97,7 @@ export default function DataProvider({ children }) {
     return await contractRO.ownerOf(orgId);
   }
 
-  const organizationLists = useCallback(async () => {
+  const organizationLists = async () => {
     try {
       const list = await contractRO.organizationLists();
       const ids = list.map((id) => toNumber(id));
@@ -107,7 +107,7 @@ export default function DataProvider({ children }) {
         console.log(error);
       }
     }
-  }, [contractRO, toNumber]);
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   async function organizationListsByUser() {
@@ -226,7 +226,7 @@ export default function DataProvider({ children }) {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   async function fetchCtypes() {
-    if (!isCTLoading) [];
+    // if (!isCTLoading) [];
     if (organizations.length > 0) {
       Promise.all(
         organizations.map(async (org) => {
@@ -240,6 +240,7 @@ export default function DataProvider({ children }) {
                 .map((d) => JSON.stringify(d))
                 .filter(unique)
                 .map((a) => JSON.parse(a));
+              console.log(uniqeCtypes);
               return [...uniqeCtypes];
             });
           }
@@ -247,15 +248,17 @@ export default function DataProvider({ children }) {
         })
         // @ts-ignore
       ).then((ct) => {
+        // setCredentialTypes(ct);
         setIsCTLoading(false);
       });
     }
   }
 
-  function refetchCtypes() {
+  async function refetchCtypes() {
     setIsCTLoading(true);
-    fetchCtypes();
+    await fetchCtypes();
   }
+
   function fetchCtypesByOrg({ orgId }) {
     return contractRO.ctypeLists(orgId).then(async (data) => {
       const ctypes = await Promise.all(
@@ -268,35 +271,40 @@ export default function DataProvider({ children }) {
     });
   }
 
-  function deleteCtype({ organizationId, ctypeId }) {
-    const id = uid();
+  async function deleteCtype({ organizationId, ctypeId }) {
+    const id_loading = uid();
+    const id_error = uid();
+    const id_success = uid();
     notify({
-      id,
+      id: id_loading,
       status: "loading",
       name: "Delete credential type",
       message: `Selected credential type is being removed.`,
     });
-    contractRW.deleteCtype(organizationId, ctypeId).then(async (tx, error) => {
-      if (error) {
-        const id = uid();
+    await contractRW
+      .deleteCtype(organizationId, ctypeId)
+      .then(async (tx, error) => {
+        if (error) {
+          notify({
+            id: id_error,
+            status: "error",
+            name: "Error",
+            message: `Failed to delete CType.\n${error.toString()}`,
+          });
+          return;
+        }
+
+        await tx.wait();
         notify({
-          id,
-          status: "error",
-          name: "Error",
-          message: `Failed to delete CType.\n${error.toString()}`,
+          id: id_success,
+          status: "success",
+          name: "Removed",
+          message: `Credential type has been removed Selendra blockchain!`,
         });
-        return;
-      }
-      await tx.wait();
-      hide(id);
-      const id2 = uid();
-      notify({
-        id: id2,
-        status: "success",
-        name: "Removed",
-        message: `Credential type has been removed Selendra blockchain!`,
-      });
-    });
+        hide(id_loading);
+        setCredentialTypes((prev) => prev.filter((x) => x.id !== ctypeId));
+      })
+      .catch((error) => console.log(error));
   }
   // uint256 organizationId,
   // string memory propertiesURI,
@@ -518,7 +526,7 @@ export default function DataProvider({ children }) {
 
   useEffect(() => {
     if (!checkingAuth && publicKey && contractRO && !isOrgLoading && isCTLoading) {
-      fetchCtypes();
+      fetchCtypes().then(() => console.log("refected"));
     }
   }, [checkingAuth, isCTLoading, isOrgLoading, fetchCtypes, contractRO, publicKey]);
 
@@ -536,6 +544,7 @@ export default function DataProvider({ children }) {
     if (!checkingAuth && publicKey && contractRO) {
       async function loadAll() {
         fetchOwnOrgzations();
+        console.log("i ran");
       }
 
       loadAll();
@@ -574,6 +583,7 @@ export default function DataProvider({ children }) {
     isCTLoading,
     credentialTypes,
     fetchCtypes,
+    refetchCtypes,
     createCtype,
     deleteCtype,
     usersByCTypes,

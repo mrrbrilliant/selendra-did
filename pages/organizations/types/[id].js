@@ -205,7 +205,7 @@ const CreateType = () => {
         const _obj = JSON.parse(data[0]);
         const propertiesURI = `https://gateway.kumandra.org/files/${_obj.Hash}`;
         const propertiesHash = ethers.utils.sha256(ethers.utils.toUtf8Bytes(propertiesURI));
-        console.log({ ...createCtypeForm, propertiesURI, propertiesHash });
+
         createCtype({ ...createCtypeForm, propertiesURI, propertiesHash, organizationId: parseInt(id) });
       })
       .then(() => true)
@@ -314,9 +314,11 @@ const CreateType = () => {
 
   const validateCreate = useCallback(() => {
     const _valid_schema = schema.description !== "" && schema.ownerId !== "" && schema.images.length > 0;
-    const _props = propsArray.map((a) => a.name !== "" && a.type !== "" && a.descriptions !== "");
-    const _valid_props = _props.includes(false);
-    const _valid = _valid_schema && !_valid_props;
+
+    const _props = propsArray.map((a) => (a.name !== "" && a.type !== "" && a.descriptions !== "" ? true : false));
+    const _valid_props = _props.filter((x) => !x);
+    console.log("_valid_props", _valid_props);
+    const _valid = _valid_schema && (_valid_props.length === 0 ? true : false);
     console.log(_valid);
     setValid(_valid);
   }, [schema, propsArray, setValid]);
@@ -361,14 +363,6 @@ const CreateType = () => {
     }
   }, [wallet, toggleRequest, show]);
 
-  // useEffect(() => {
-  //   console.log(propsObject);
-  // }, [propsObject]);
-
-  // useEffect(() => {
-  //   console.log(schema);
-  // }, [schema]);
-
   return (
     <div className="">
       <Modal open={createCtypeModalOpen} toggle={toggleCreateOpenModal}>
@@ -378,7 +372,7 @@ const CreateType = () => {
           <button className="btn btn-success flex-grow" onClick={handleCreateCtype}>
             Create
           </button>
-          <button className="btn btn-info flex-grow" onClick={toggleCreateOpenModal}>
+          <button className="btn btn-error flex-grow" onClick={toggleCreateOpenModal}>
             Cancel
           </button>
         </div>
@@ -773,7 +767,6 @@ const NewProperty = ({ data, removeProp, handlePropsChange, handleAddOption, han
             value={data.name}
             onChange={(e) => handlePropsChange(e, data.id)}
             className="w-full input input-bordered"
-            // placeholder="Name"
           />
         </div>
         <div>
@@ -787,7 +780,7 @@ const NewProperty = ({ data, removeProp, handlePropsChange, handleAddOption, han
               defaultValue={data.type}
               onChange={(e) => handlePropsChange(e, data.id)}
             >
-              <option disabled>Choose a type</option>
+              <option value={""}>Choose a type</option>
               {dataTypes.map((option) => (
                 <option key={option.label} value={JSON.stringify(option)}>
                   {option.label}

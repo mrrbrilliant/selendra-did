@@ -5,14 +5,23 @@ import { ethers } from "ethers";
 import Link from "next/link";
 import Image from "next/image";
 import Modal from "../../components/modal";
-import { VscChevronDown } from "react-icons/vsc";
+import { VscEllipsis, VscTrash } from "react-icons/vsc";
 import { WalletContext } from "../../contexts/wallet";
 import { VscVerified, VscUnverified } from "react-icons/vsc";
 import BtnWithAuth from "../../hooks/useAuthCallback";
 
 export default function Org() {
-  const { organizations, isOrgLoading, credentialTypes, isCTLoading, ownOrganizations, isOwnOrgLoading, deleteOrg } =
-    React.useContext(DataContext);
+  const {
+    organizations,
+    isOrgLoading,
+    credentialTypes,
+    isCTLoading,
+    // refetchCtypes,
+    ownOrganizations,
+    isOwnOrgLoading,
+    deleteOrg,
+    deleteCtype,
+  } = React.useContext(DataContext);
   const { wallet, checkingAuth } = React.useContext(WalletContext);
   const [isCheckingUnverifiedDocs, setIsCheckUnverifiedDocs] = useState(true);
 
@@ -21,6 +30,8 @@ export default function Org() {
   const [org, setOrg] = useState();
   const [isOwnOrg, setIsOwnOrg] = useState(false);
   const [removeModalOpen, setRemoveModelOpen] = useState(false);
+  const [showDeleteCT, setShowDeleteCT] = useState(false);
+  const [toDeleteCT, setToDeleteCT] = useState({ organizationId: "", ctypeId: "" });
 
   const router = useRouter();
   const { id } = router.query;
@@ -37,8 +48,18 @@ export default function Org() {
     }
   }
 
+  function toggleDeleteCt() {
+    setShowDeleteCT(!showDeleteCT);
+  }
+
   function toggleRemoveModel() {
     setRemoveModelOpen(!removeModalOpen);
+  }
+
+  function handleDeleteCT() {
+    deleteCtype({ ...toDeleteCT });
+    setToDeleteCT({ organizationId: "", ctypeId: "" });
+    toggleDeleteCt();
   }
 
   const handleDeleteOrg = () => {
@@ -109,6 +130,19 @@ export default function Org() {
 
   return (
     <>
+      {/* toggleDeleteCt */}
+      <Modal open={showDeleteCT} toggle={toggleDeleteCt}>
+        <h3 className="font-bold text-lg">Caution!</h3>
+        <p className="py-4">You are about to remove this type! This is irriversable! Are you sure</p>
+        <div className="modal-action">
+          <button className="btn btn-error" onClick={handleDeleteCT}>
+            Remove
+          </button>
+          <button className="btn btn-info" onClick={toggleDeleteCt}>
+            Cancel
+          </button>
+        </div>
+      </Modal>
       <Modal open={removeModalOpen} toggle={toggleRemoveModel}>
         <h3 className="font-bold text-lg">Caution!</h3>
         <p className="py-4">
@@ -123,7 +157,7 @@ export default function Org() {
           </button>
         </div>
       </Modal>
-      <div className="flex justify-between -mt-9 rounded-xl">
+      <div className="flex justify-between  rounded-xl">
         <h3 className="font-bold text-xl p-2">{org?.name}</h3>
         {isOwnOrg && (
           <div>
@@ -131,7 +165,7 @@ export default function Org() {
               <label className="btn btn-error btn-outline rounded-xl modal-button ml-2">Remove Organization</label>
             </BtnWithAuth>
             <Link href={`/organizations/types/${id}`}>
-              <label className="btn bg-accent rounded-xl modal-button ml-2" htmlFor="my-modal-3">
+              <label className="btn bg-primary rounded-xl modal-button ml-2" htmlFor="my-modal-3">
                 Create Documents Type
               </label>
             </Link>
@@ -144,8 +178,16 @@ export default function Org() {
         {credentialTypes &&
           credentialTypes
             .filter((o) => toNumber(o.orgId) === parseInt(id))
-            .map((type, index) => {
-              return <TypeCard key={index} type={type} isOwnOrg={isOwnOrg} />;
+            .map((type) => {
+              return (
+                <TypeCard
+                  key={type.propertiesHash}
+                  type={type}
+                  isOwnOrg={isOwnOrg}
+                  setToDeleteCT={setToDeleteCT}
+                  toggleDeleteCt={toggleDeleteCt}
+                />
+              );
             })}
       </div>
       {isOwnOrg && unVerifiedDocs.length > 0 && (
@@ -154,7 +196,7 @@ export default function Org() {
           <div className="grid grid-cols-3 mt-6 gap-6 ">
             {unVerifiedDocs &&
               unVerifiedDocs.map((res, index) => {
-                return <DocumentCard key={index} res={res} />;
+                return <DocumentCard key={index} res={res} setIsCheckUnverifiedDocs={setIsCheckUnverifiedDocs} />;
               })}
           </div>
         </div>
@@ -164,7 +206,7 @@ export default function Org() {
   );
 }
 
-const TypeCard = ({ type, isOwnOrg }) => {
+const TypeCard = ({ type, isOwnOrg, setToDeleteCT, toggleDeleteCt }) => {
   const [detail, setDetail] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -174,6 +216,11 @@ const TypeCard = ({ type, isOwnOrg }) => {
     const toUnit = ethers.utils.formatEther(number).toString();
     const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
     return roundedCount;
+  }
+
+  function handleDelete() {
+    setToDeleteCT({ organizationId: type.orgId, ctypeId: type.id });
+    toggleDeleteCt();
   }
 
   useEffect(() => {
@@ -188,12 +235,13 @@ const TypeCard = ({ type, isOwnOrg }) => {
     }
   }, [isLoading, setDetail, propertiesURI]);
 
+  console.log(type);
   if (isLoading) {
     return <div>Loading</div>;
   }
 
   return (
-    <div className=" rounded-lg p-3  border-gray-100 bg-base-100">
+    <div className=" rounded-xl p-3  border-gray-100 bg-base-100 relative">
       <div className="flex space-x-4 p-4">
         <div className="w-40 h-40 text-center">
           <Image
@@ -216,7 +264,7 @@ const TypeCard = ({ type, isOwnOrg }) => {
           <div className="absolute bottom-0 flex gap-4">
             {isOwnOrg && (
               <Link href={`/organizations/docs?orgId=${toNumber(type.orgId)}&type=${type?.id}`}>
-                <button className="btn py-2 px-4 text-white leading-none rounded font-bold  bg-primarypink hover:bg-opacity-75  uppercase">
+                <button className="btn py-2 px-4 text-white leading-none rounded-xl font-bold  bg-primarypink hover:bg-opacity-75  uppercase">
                   Create
                 </button>
               </Link>
@@ -224,25 +272,39 @@ const TypeCard = ({ type, isOwnOrg }) => {
 
             {!isOwnOrg && (
               <Link href={`/organizations/docs?orgId=${toNumber(type.orgId)}&type=${type?.id}`}>
-                <button className="btn py-2 px-4 text-white leading-none rounded font-bold  bg-primarypink hover:bg-opacity-75  uppercase">
+                <button className="btn py-2 px-4 text-white leading-none rounded-xl font-bold  bg-primarypink hover:bg-opacity-75  uppercase">
                   Request
                 </button>
               </Link>
             )}
 
             <Link href={`/organizations/docs/${type?.id}`}>
-              <button className="btn py-2 px-4 text-white leading-none rounded font-bold  bg-primarypink hover:bg-opacity-75  uppercase">
+              <button className="btn py-2 px-4 text-white leading-none rounded-xl font-bold  bg-primarypink hover:bg-opacity-75  uppercase">
                 Details
               </button>
             </Link>
           </div>
         </div>
       </div>
+      {isOwnOrg && (
+        <div className="dropdown dropdown-end absolute top-3 right-3">
+          <label tabIndex={0} className="btn btn-sm btn-circle m-1">
+            <VscEllipsis size={24} />
+          </label>
+          <ul tabIndex={0} className="dropdown-content menu p-0 shadow bg-base-200 rounded-box w-52">
+            <li>
+              <a className="btn btn-error text-error-content justify-start rounded-box" onClick={handleDelete}>
+                <VscTrash size={18} /> Delete
+              </a>
+            </li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
 
-const DocumentCard = ({ res }) => {
+const DocumentCard = ({ res, setIsCheckUnverifiedDocs }) => {
   const { organizations, isOrgLoading, credentialTypes, createDocument } = React.useContext(DataContext);
   const { wallet } = useContext(WalletContext);
 
@@ -285,6 +347,7 @@ const DocumentCard = ({ res }) => {
     const { ctypeId, to, name, propertyURI, propertyHash, _id } = res;
     createDocument({ ctypeId, to, name, propertyURI, propertyHash });
     deletePendingRequest(_id);
+    setIsCheckUnverifiedDocs(true);
   };
 
   const deletePendingRequest = async (id) => {
@@ -308,7 +371,9 @@ const DocumentCard = ({ res }) => {
 
     fetch("https://attestation.koompi.org/claims/delete", requestOptions)
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then((result) => {
+        setIsCheckUnverifiedDocs(true);
+      })
       .catch((error) => console.log("error", error));
   };
 

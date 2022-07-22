@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+/* eslint-disable @next/next/no-img-element */
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { DataContext } from "../../../contexts/data";
 import { ContractContext } from "../../../contexts/contract";
@@ -6,17 +7,29 @@ import { WalletContext } from "../../../contexts/wallet";
 import { ethers } from "ethers";
 import { VscVerified, VscUnverified } from "react-icons/vsc";
 import Link from "next/link";
+import Badge from "../../../components/badge";
 
 export default function CreateDoc() {
   const { contractRO, contractRW } = useContext(ContractContext);
   const { usersByCTypes } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(true);
   const [allDocsByCtype, setAllDocsByCtype] = useState([]);
+  const [type, setType] = useState(null);
   const router = useRouter();
   const { id } = router.query;
 
+  function toNumber(number) {
+    const toUnit = ethers.utils.formatEther(number).toString();
+    const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
+    return roundedCount;
+  }
+
   useEffect(() => {
-    if (contractRO) {
+    console.log("id", id);
+  }, [id]);
+
+  useEffect(() => {
+    if (contractRO && id) {
       if (isLoading) {
         usersByCTypes(id).then((docs) => {
           setAllDocsByCtype(docs);
@@ -26,11 +39,21 @@ export default function CreateDoc() {
     }
   }, [isLoading, setIsLoading, setAllDocsByCtype, usersByCTypes, id, contractRO]);
 
+  useEffect(() => {
+    if (allDocsByCtype && !type) {
+      const thisType = allDocsByCtype.filter((c) => toNumber(c.ctypeId) === parseInt(id));
+      setType(thisType[0]);
+    }
+  }, [allDocsByCtype, toNumber, id, type]);
+
   return (
-    <div className="grid grid-cols-3 gap-6">
-      {allDocsByCtype.map((res, index) => (
-        <DocumentCard key={index} res={res} />
-      ))}
+    <div>
+      <h1 className="text-3xl font-bold my-6">{type?.name}</h1>
+      <div className="grid grid-cols-1 gap-6">
+        {allDocsByCtype.map((res, index) => (
+          <DocumentCard key={index} res={res} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -40,19 +63,20 @@ const DocumentCard = ({ res }) => {
     React.useContext(DataContext);
   const { wallet } = useContext(WalletContext);
 
-  const [typeDetail, setTypeDetail] = useState();
-  const [orgDetail, setOrgDetail] = useState();
-  const [docDetail, setDocDetail] = useState();
-  const [cType, setCType] = useState();
+  const [typeDetail, setTypeDetail] = useState(null);
+  const [orgDetail, setOrgDetail] = useState(null);
+  const [docDetail, setDocDetail] = useState(null);
+  const [cType, setCType] = useState(null);
 
-  function toNumber(number) {
+  const toNumber = useCallback((number) => {
     const toUnit = ethers.utils.formatEther(number).toString();
     const roundedCount = Math.round(parseFloat(toUnit) * 10 ** 18);
     return roundedCount;
-  }
+  }, []);
 
-  async function getCType() {
+  const getCType = useCallback(async () => {
     const id = toNumber(res.ctypeId);
+
     const ct = credentialTypes.filter((c) => c.id === id)[0];
 
     const orgId = toNumber(ct.orgId);
@@ -73,7 +97,7 @@ const DocumentCard = ({ res }) => {
     setOrgDetail(org);
     setDocDetail(doc);
     setCType(ct);
-  }
+  }, [toNumber, credentialTypes, organizations, setTypeDetail, setOrgDetail, setDocDetail, setCType, res]);
 
   const handleCreateDoc = async () => {
     const { ctypeId, to, name, propertyURI, propertyHash, _id } = res;
@@ -107,46 +131,59 @@ const DocumentCard = ({ res }) => {
   };
 
   useEffect(() => {
-    getCType();
-  }, []);
+    if (credentialTypes.length > 0 && organizations) {
+      getCType();
+    }
+  }, [credentialTypes, organizations, getCType]);
 
   useEffect(() => {
-    console.log(res);
-  }, [res]);
+    console.log(docDetail);
+  }, [docDetail]);
 
   return (
     <div className=" rounded-lg p-6  border-gray-100 bg-base-100 relative overflow-hidden">
       <div className="flex flex-col place-items-start place-content-start">
-        {typeDetail && typeDetail.images && (
-          <div className="w-full  h-max flex place-content-center place-items-center mb-4">
-            <img className="w-auto max-h-64" src={typeDetail.images[0]} alt="" />
+        <div className="w-full flex flex-row place-content-center">
+          <div className="form-control w-full">
+            <label className="label pl-0">
+              <span className="label-text font-bold">Owner</span>
+            </label>
+            <textarea
+              className="w-full focus:outline-none resize-none bg-transparent font-mono text-xs"
+              readOnly
+              value={res.owner}
+            />
           </div>
-        )}
-        <div className="w-full flex flex-col flex-grow space-y-2">
-          <h4 className="text-2xl font-semibold">{res.name}</h4>
-          <Badge status={res.status} />
 
-          <div className="font-normal text-sm">BY: {orgDetail?.name}</div>
-          <textarea
-            className="w-full mt-2 focus:outline-none resize-none bg-transparent"
-            readOnly
-            value={res.propertyHash}
-          />
-
-          <div className="flex space-x-4">
-            {/* <Link href={`${res.propertyURI}`}> */}
+          <div className="form-control w-full">
+            <label className="label pl-0">
+              <span className="label-text font-bold">Created at</span>
+            </label>
+            <textarea
+              className="w-full focus:outline-none resize-none bg-transparent font-mono text-xs"
+              readOnly
+              value={`${new Date(res.createdAt * 1000).toLocaleString()}`}
+            />
+          </div>
+          <div className="form-control w-full">
+            <label className="label pl-0">
+              <span className="label-text font-bold">Status</span>
+            </label>
+            {res.status === 1 && <div className="font-bold text-xs text-success">Verified</div>}
+            {res.status === 0 && <div className="font-bold text-xs text-error">Unverified</div>}
+          </div>
+          <div className="flex-grow flex space-x-4 place-content-center place-items-center">
             <a
               target="_blank"
-              href={`${res.propertyURI}`}
+              href={`/profile?user=${res.owner}&typeId=${toNumber(res.ctypeId)}`}
               rel="noopener noreferrer"
-              className="p-2 flex-grow text-white leading-none rounded font-bold mt-2 btn btn-info btn-sm hover:bg-opacity-75 text-xs uppercase"
+              className="p-2 flex-grow btn btn-primary btn-block"
             >
               Detail
             </a>
-            {/* </Link> */}
             {cType && cType.revokable && (
               <button
-                className="p-2 text-white w-32 leading-none rounded font-bold mt-2 bg-primarypink hover:bg-opacity-75 text-xs uppercase"
+                className="p-2 flex-grow btn btn-warning"
                 onClick={() => {
                   res.status === 1 && toggleRevokeDocument({ credentialid: res.id, revoke: 0 });
                   res.status === 0 && toggleRevokeDocument({ credentialid: res.id, revoke: 1 });
@@ -161,21 +198,3 @@ const DocumentCard = ({ res }) => {
     </div>
   );
 };
-
-function Badge({ status }) {
-  if (status) {
-    return (
-      <div className="badge badge-success gap-2 p-4 pr-8 absolute -right-4 top-4 font-bold">
-        <VscVerified size={24} />
-        Verified
-      </div>
-    );
-  }
-
-  return (
-    <div className="badge badge-error gap-2 p-4 pr-8 absolute -right-4 top-4 font-bold">
-      <VscUnverified size={24} />
-      Unverified
-    </div>
-  );
-}

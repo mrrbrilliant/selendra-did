@@ -54,7 +54,3 @@ export default function Unlock() {
     </div>
   );
 }
-
-// Unlock.getLayout = function PageLayout(page) {
-//   return <>{page}</>;
-// };

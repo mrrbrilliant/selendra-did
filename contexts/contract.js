@@ -16,6 +16,7 @@ export default function ContractProvider({ children }) {
   const { wallet, publicKey } = useContext(WalletContext);
   const [contractRO, setContractRO] = useState(null);
   const [contractRW, setContractRW] = useState(null);
+  const [contractPub, setContractPub] = useState(null);
 
   useEffect(() => {
     if (wallet && !contractRW) {
@@ -31,9 +32,17 @@ export default function ContractProvider({ children }) {
     }
   }, [publicKey, network, setContractRO, contractRO]);
 
+  useEffect(() => {
+    if (network && !contractPub) {
+      const _contract_pub = new ethers.Contract(contractAddress, CTypeManagement.abi, network);
+      setContractPub(_contract_pub);
+    }
+  }, [network, contractPub, setContractPub]);
+
   const value = {
     contractRO,
     contractRW,
+    contractPub,
   };
   return <ContractContext.Provider value={value}>{children}</ContractContext.Provider>;
 }

@@ -8,6 +8,7 @@ export default function UnlockWallet() {
   const { contractRW } = useContext(ContractContext);
   const [password, setPassword] = useState("");
   const [unlocked, setUnlocked] = useState(false);
+  const [error, setError] = useState(null);
 
   function handleChange(e) {
     const { value } = e.target;
@@ -15,13 +16,18 @@ export default function UnlockWallet() {
   }
 
   function handleSubmit(e) {
+    setError(null);
     e.preventDefault();
-    unlockWallet({ password }).then((data) => {
-      if (data) {
-        setUnlocked(true);
-        toggleRequest();
-      }
-    });
+    unlockWallet({ password })
+      .then((data) => {
+        if (data) {
+          setUnlocked(true);
+          toggleRequest();
+        }
+      })
+      .catch((err) => {
+        setError(err.toString());
+      });
   }
 
   // ✅ Promise check
@@ -63,17 +69,24 @@ export default function UnlockWallet() {
           <div className="card-body p-0">
             <a className="label font-bold">UNLOCK WALLET</a>
             <form className="form-control w-full" onSubmit={handleSubmit}>
-              <label className="label">
-                <span className="label-text">Password to unlock your wallet</span>
-              </label>
-              <input
-                type="password"
-                placeholder="xxxxxx"
-                className="input input-bordered w-full"
-                name="password"
-                value={password}
-                onChange={handleChange}
-              />
+              <div>
+                <label className="label">
+                  <span className="label-text">Password to unlock your wallet</span>
+                </label>
+                <input
+                  type="password"
+                  placeholder="xxxxxx"
+                  className="input input-bordered w-full"
+                  name="password"
+                  value={password}
+                  onChange={handleChange}
+                />
+                {error && (
+                  <label className="label">
+                    <span className="label-text text-error">{error}</span>
+                  </label>
+                )}
+              </div>
               <label className="label mt-2">
                 <input type="submit" value="UNLOCK" className="w-full btn btn-primary text-primary-content" />
               </label>

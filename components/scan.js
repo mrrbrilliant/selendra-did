@@ -6,32 +6,42 @@ import { WalletContext } from "../contexts/wallet";
 
 export default function Scanner({ toggleQr }) {
   const { wallet, show, toggleRequest, publicKey } = useContext(WalletContext);
-  const [data, setData] = useState("");
+  const [data, setData] = useState({
+    id: "",
+    link: "",
+  });
   const [emitLock, setEmitLock] = useState(false);
   const router = useRouter();
 
-  const submit = useCallback(({ id, signature, publicKey }) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
+  const submit = useCallback(
+    ({ id, signature, publicKey }) => {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
 
-    const raw = JSON.stringify({
-      id,
-      signature: `Web3 ${signature}`,
-      publicKey,
-    });
+      const raw = JSON.stringify({
+        id,
+        signature: `Web3 ${signature}`,
+        publicKey,
+      });
 
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
 
-    fetch("http://192.168.74.7:7000/login/qr/web3", requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.log("error", error));
-  }, []);
+      fetch(data.link, requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          console.log(result);
+          setEmitLock(false);
+          toggleQr();
+        })
+        .catch((error) => console.log("error", error));
+    },
+    [data.link, setEmitLock, toggleQr]
+  );
 
   const signMessage = useCallback(
     (msg) => {
@@ -53,7 +63,7 @@ export default function Scanner({ toggleQr }) {
   useEffect(() => {
     if (data) {
       if (data.id && !emitLock) {
-        // setEmitLock(true);
+        setEmitLock(true);
         signMessage(data.id).then((msg) => {
           submit({ id: data.id, signature: msg, publicKey });
         });
